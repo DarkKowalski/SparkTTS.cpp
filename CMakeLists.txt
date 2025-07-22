@@ -11,6 +11,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Third-party dependencies
-find_package(spdlog CONFIG REQUIRED)
+find_package(OpenVINO REQUIRED COMPONENTS Runtime)
+find_package(OpenVINOGenAI REQUIRED)
+find_package(SndFile CONFIG REQUIRED)
+find_package(argparse CONFIG REQUIRED)
 
 add_subdirectory(src)

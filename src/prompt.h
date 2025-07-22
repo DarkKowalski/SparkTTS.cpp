@@ -1,0 +1,29 @@
+#pragma once
+
+#include <openvino/openvino.hpp>
+#include <string>
+#include <vector>
+#include <cstdint>
+
+namespace spark_tts
+{
+    enum class PromptGender : uint8_t
+    {
+        kFemale = 0,
+        kMale = 1,
+    };
+
+    enum class PromptLevel : uint8_t
+    {
+        kVeryLow = 0,
+        kLow = 1,
+        kModerate = 2,
+        kHigh = 3,
+        kVeryHigh = 4,
+    };
+
+    std::string stringify_global_tokens(const ov::Tensor &global_tokens);
+    std::string stringify_semantic_tokens(const ov::Tensor &semantic_tokens);
+    std::string assemble_prompt(const std::string &global_token_input, const std::string &text);
+    std::vector<int64_t> extract_semantic_token_ids(const std::string &semantic_tokens_string);
+}
