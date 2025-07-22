@@ -1,0 +1,5 @@
+#ifdef ENABLE_PERFETTO
+#include "perfetto_categories.h"
+
+PERFETTO_TRACK_EVENT_STATIC_STORAGE();
+#endif // ENABLE_PERFETTO

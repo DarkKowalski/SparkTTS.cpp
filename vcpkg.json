@@ -1,12 +1,8 @@
 {
   "dependencies": [
-    {
-      "name": "openvino",
-      "version>=": "2025.1.0"
-    },
-    {
-      "name": "spdlog",
-      "version>=": "1.15.3"
-    }
+    "libsndfile",
+    "argparse",
+    "perfetto",
+    "nlohmann-json"
   ]
 }
