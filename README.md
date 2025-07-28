@@ -12,10 +12,29 @@
 
 [vcpkg](https://github.com/microsoft/vcpkg)
 
+### Build llama.cpp
+
+#### Windows
+
+1. Make sure you are using `x64 Native Tools Command Prompt for VS 2022`
+
+2. Setup Vulkan dependencies, [llama.cpp build doc](https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md#vulkan)
+
+3. Build and install with CMake
+
+```batch
+cd third_party\llama.cpp
+cmake -B build -G Ninja -DGGML_VULKAN=ON -DLLAMA_CURL=OFF -DCMAKE_INSTALL_PREFIX=..\..\lib\llama
+cmake --build build --config Release
+cmake --install build --config Release
+cd ..\..
+```
+
 
 ### Build with CMake and Ninja
 
 ```bash
-cmake --preset=vcpkg
-cmake --build --config Release
+cmake --preset=vcpkg -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+cmake --install build --config Release
 ```

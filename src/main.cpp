@@ -1,5 +1,6 @@
 #include <openvino/openvino.hpp>
 #include <openvino/genai/llm_pipeline.hpp>
+#include <llama-cpp.h>
 
 #include <sndfile.hh>
 

@@ -156,7 +156,9 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,linux,windows,cmake,c++,vcpkg
-/openvino
 /build
-*.wav
+/install
 /models
+/third_party/openvino
+/lib
+*.wav

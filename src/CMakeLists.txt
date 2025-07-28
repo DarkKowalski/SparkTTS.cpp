@@ -12,4 +12,13 @@ target_link_libraries(spark_tts PRIVATE
     openvino::genai
     SndFile::sndfile
     argparse::argparse
+    llama
 )
+
+install(TARGETS spark_tts
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION bin
+    ARCHIVE DESTINATION bin
+)
+install_llama("${CMAKE_INSTALL_PREFIX}/bin")
+install_openvino("${CMAKE_INSTALL_PREFIX}/bin")
