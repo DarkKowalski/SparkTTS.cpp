@@ -33,8 +33,10 @@ cd ..\..
 
 ### Build with CMake and Ninja
 
-```bash
+#### Windows
+
+```batch
 cmake --preset=vcpkg -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
-cmake --install build --config Release
+cmake --install build --config Release && copy /Y build\src\*.dll install\bin
 ```
