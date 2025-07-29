@@ -162,3 +162,4 @@ $RECYCLE.BIN/
 /third_party/openvino
 /lib
 *.wav
+*.gguf

@@ -8,7 +8,7 @@ function(install_openvino dest_dir)
             install(FILES ${LIB_FILES} DESTINATION ${dest_dir})
 
             # Third-party libraries
-            file(GLOB_RECURSE THIRD_PARTY_LIB_FILES "${OPENVINO_ROOT_DIR}/runtime/third_party/tbb/bin/*.dll")
+            file(GLOB_RECURSE THIRD_PARTY_LIB_FILES "${OPENVINO_ROOT_DIR}/runtime/3rdparty/tbb/bin/*.dll")
             # exclude _debug.dll files
             list(FILTER THIRD_PARTY_LIB_FILES EXCLUDE REGEX ".*_debug.dll")
             install(FILES ${THIRD_PARTY_LIB_FILES} DESTINATION ${dest_dir})
@@ -17,7 +17,7 @@ function(install_openvino dest_dir)
             install(FILES ${LIB_FILES} DESTINATION ${dest_dir})
 
             # Third-party libraries
-            file(GLOB_RECURSE THIRD_PARTY_LIB_FILES "${OPENVINO_ROOT_DIR}/runtime/third_party/tbb/bin/*_debug.dll")
+            file(GLOB_RECURSE THIRD_PARTY_LIB_FILES "${OPENVINO_ROOT_DIR}/runtime/3rdparty/tbb/bin/*_debug.dll")
             install(FILES ${THIRD_PARTY_LIB_FILES} DESTINATION ${dest_dir})
         endif()
     elseif (APPLE)

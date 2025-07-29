@@ -3,7 +3,9 @@ add_executable(spark_tts
     audio_detokenizer.cpp
     prompt.cpp
     utils.cpp
-    llm_streamer.cpp
+    sampler.cpp
+    tokenizer.cpp
+    transformer.cpp
     main.cpp
 )
 
