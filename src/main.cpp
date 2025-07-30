@@ -14,12 +14,14 @@
 #include <fstream>
 #include <functional>
 
+#include "utils.h"
 #include "synthesizer.h"
 
 int main(int argc, char *argv[])
 {
     try
     {
+        auto ref_audio = spark_tts::load_reference_audio("prompt_audio.wav");
 
         spark_tts::Synthesizer synthesizer;
 
@@ -31,36 +33,32 @@ int main(int argc, char *argv[])
 
         synthesizer.init_text_to_speech(
             "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml",
-            "./models/Spark-TTS-0.5B/GGUF/LLM-507M-Q4_K.gguf",
+            "./models/Spark-TTS-0.5B/GGUF/LLM-507M-F16.gguf",
             "./models/Spark-TTS-0.5B/LLM/",
             "CPU");
 
-        const std::string text = "Hi how are you";
-        std::vector<float> audio_data(16000 * 1, 0.1f); // Dummy audio data, replace with actual audio data
+        const std::string text = "根据统计数据，法国奥德省人口第四多的是哪个市镇？";
 
-        auto voice_features = synthesizer.extract_voice_features(audio_data);
-        for (const auto &feature : voice_features)
+        auto voice_features = synthesizer.extract_voice_features(ref_audio);
+
+        std::vector<float> generated;
+        spark_tts::Synthesizer::TextToSpeechCallback callback = [&generated](std::vector<float> &audio_output) -> bool
         {
-            std::cout << feature << " ";
-        }
-        std::cout << std::endl;
-
-
-        spark_tts::Synthesizer::TextToSpeechCallback callback = [](std::vector<float> &audio_output) -> bool
-        {
-            // Here you can process the audio output, e.g., play it or save it to a file
-            std::cout << "Generated audio data size: " << audio_output.size() << std::endl;
-            for (const auto &sample : audio_output)
-            {
-                std::cout << sample << " ";
-            }
-            std::cout << std::endl;
+            generated.insert(generated.end(), audio_output.begin(), audio_output.end());
             return true; // Return true to continue generating, false to stop
         };
 
-        synthesizer.text_to_speech(text, voice_features, 5, callback);
+        std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+        synthesizer.text_to_speech(text, voice_features, 100, callback);
+        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_time - start_time;
 
-    } catch (const std::exception &e)
+        std::cout << "Text-to-speech generation took " << elapsed_seconds.count() << " seconds." << std::endl;
+        std::cout << "Generated audio seconds: " << generated.size() / 16000.0 << " seconds." << std::endl;
+
+        spark_tts::save_generated_audio("output.wav", generated);
+    }
+    catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

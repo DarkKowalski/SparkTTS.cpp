@@ -13,6 +13,7 @@
 #include "audio_detokenizer.h"
 #include "transformer.h"
 #include "prompt.h"
+#include "token_buffer.h"
 
 namespace spark_tts
 {
@@ -43,6 +44,8 @@ namespace spark_tts
         void init_text_to_speech(const std::string &audio_detokenizer_model_path,
                                  const std::string &transformer_model_path,
                                  const std::string &tokenizer_path,
+                                 const size_t overlapped_semantic_tokens,
+                                 const size_t callback_semantic_tokens,
                                  const std::string &device_name);
 
     public:
@@ -59,16 +62,19 @@ namespace spark_tts
                                                           std::array<int32_t, 32> &voice_features,
                                                           TextToSpeechCallback &callback);
 
+        bool synthesize(const std::array<int32_t, 32> &voice_features, std::vector<float> &generated_audio);
+
     private:
         ov::Core core_;
 
         std::unique_ptr<AudioTokenizer> audio_tokenizer_;
         std::unique_ptr<AudioDetokenizer> audio_detokenizer_;
         std::unique_ptr<Transformer> transformer_;
+        std::unique_ptr<TokenBuffer> token_buffer_;
 
-        const size_t overlapped_semantic_tokens_ = 2;
-        const size_t max_semantic_tokens_per_generation_ = 50;
-        std::array<int64_t, 50> semantic_tokens_buffer_;
+        bool first_sample_generated_; // Flag to indicate if the first sample has been generated
+        size_t overlapped_semantic_tokens_; // Number of tokens to overlap between generations
+        size_t callback_semantic_tokens_;  // Number of tokens to trigger callback, 0 for immediate callback
     };
 
 } // namespace spark_tts

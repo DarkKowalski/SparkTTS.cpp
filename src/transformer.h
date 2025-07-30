@@ -23,6 +23,7 @@ namespace spark_tts
                 model_params = llama_model_default_params();
                 sampler_params = SamplerParameters();
 
+                ctx_params.n_ctx = 2048;
                 ctx_params.n_ubatch = 1;      // NVIDIA RTX4070 Vulkan backend will generate NaN logits with 512 n_ubatch.
                 ctx_params.no_perf = true;    // Disable performance metrics
                 ctx_params.flash_attn = true; // Enable flash attention

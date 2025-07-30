@@ -7,6 +7,7 @@ add_executable(spark_tts
     tokenizer.cpp
     transformer.cpp
     synthesizer.cpp
+    token_buffer.cpp
     main.cpp
 )
 
@@ -18,6 +19,7 @@ add_library(tts_api SHARED
     tokenizer.cpp
     transformer.cpp
     synthesizer.cpp
+    token_buffer.cpp
     api.cpp
 )
 
