@@ -5,6 +5,15 @@
 
 namespace spark_tts
 {
+    std::string stringify_global_tokens(const std::array<int32_t, 32> &global_tokens)
+    {
+        std::ostringstream oss;
+        for (size_t i = 0; i < global_tokens.size(); ++i)
+        {
+            oss << "<|bicodec_global_" << global_tokens[i] << "|>";
+        }
+        return oss.str();
+    }
 
     std::string stringify_global_tokens(const ov::Tensor &global_tokens)
     {
@@ -15,16 +24,6 @@ namespace spark_tts
             oss << "<|bicodec_global_" << global_token_ids[i] << "|>";
         }
 
-        return oss.str();
-    }
-    std::string stringify_semantic_tokens(const ov::Tensor &semantic_tokens)
-    {
-        std::ostringstream oss;
-        auto semantic_token_ids = semantic_tokens.data<int64_t>();
-        for (size_t i = 0; i < semantic_tokens.get_size(); ++i)
-        {
-            oss << "<|bicodec_semantic_" << semantic_token_ids[i] << "|>";
-        }
         return oss.str();
     }
 

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <openvino/openvino.hpp>
+
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <array>
 
 namespace spark_tts
 {
@@ -23,7 +25,9 @@ namespace spark_tts
     };
 
     std::string stringify_global_tokens(const ov::Tensor &global_tokens);
-    std::string stringify_semantic_tokens(const ov::Tensor &semantic_tokens);
+    std::string stringify_global_tokens(const std::array<int32_t, 32> &global_tokens);
+
     std::string assemble_prompt(const std::string &global_token_input, const std::string &text);
+
     std::vector<int64_t> extract_semantic_token_ids(const std::string &semantic_tokens_string);
 }

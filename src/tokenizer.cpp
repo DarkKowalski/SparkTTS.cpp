@@ -24,6 +24,7 @@ namespace spark_tts
         std::vector<int64_t> token_ids(
             ov_tokens.input_ids.data<int64_t>(),
             ov_tokens.input_ids.data<int64_t>() + ov_tokens.input_ids.get_size());
+        // NOTE: OpenVINO tokenizer uses int64_t for token IDs, while llama_token is typically int32_t.
         std::vector<llama_token> llama_tokens(token_ids.begin(), token_ids.end());
         return llama_tokens;
     }

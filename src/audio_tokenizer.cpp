@@ -2,11 +2,12 @@
 
 namespace spark_tts
 {
-    AudioTokenizer::AudioTokenizer(ov::Core& core, const std::string& model_path, const std::string& device_name) {
-        const std::string wav2vec_model_path = model_path + "/AudioTokenizer/wav2vec.xml";
-        const std::string mel_spectrogram_model_path = model_path + "/AudioTokenizer/mel_spectrogram.xml";
-        const std::string bicodec_tokenizer_model_path = model_path + "/AudioTokenizer/bicodec_tokenizer.xml";
-
+    AudioTokenizer::AudioTokenizer(ov::Core &core,
+                                   const std::string &wav2vec_model_path,
+                                   const std::string &mel_spectrogram_model_path,
+                                   const std::string &bicodec_tokenizer_model_path,
+                                   const std::string &device_name)
+    {
         auto wav2vec_model = core.read_model(wav2vec_model_path);
         auto mel_spectrogram_model = core.read_model(mel_spectrogram_model_path);
         auto bicodec_tokenizer_model = core.read_model(bicodec_tokenizer_model_path);
@@ -16,14 +17,18 @@ namespace spark_tts
         bicodec_tokenizer_ = core.compile_model(bicodec_tokenizer_model, device_name);
     }
 
-    std::array<float, 16000 * 6> AudioTokenizer::pad_or_trim_audio(const std::vector<float>& mono_audio) const {
+    std::array<float, 16000 * 6> AudioTokenizer::pad_or_trim_audio(const std::vector<float> &mono_audio) const
+    {
         std::array<float, 16000 * 6> padded_audio = {};
         size_t audio_size = mono_audio.size();
 
-        if (audio_size > 16000 * 6) {
+        if (audio_size > 16000 * 6)
+        {
             // Trim the audio
             std::copy(mono_audio.begin(), mono_audio.begin() + 16000 * 6, padded_audio.begin());
-        } else {
+        }
+        else
+        {
             // Pad the audio
             std::copy(mono_audio.begin(), mono_audio.end(), padded_audio.begin());
             std::fill(padded_audio.begin() + audio_size, padded_audio.end(), 0.0f);
@@ -32,14 +37,14 @@ namespace spark_tts
         return padded_audio;
     }
 
-
-    std::pair<ov::Tensor, ov::Tensor> AudioTokenizer::tokenize(const std::vector<float>& mono_audio) {
+    std::pair<ov::Tensor, ov::Tensor> AudioTokenizer::tokenize(const std::vector<float> &mono_audio)
+    {
         auto processed_audio = pad_or_trim_audio(mono_audio);
 
         // mel_input [1, 1, 96000]
         ov::Tensor mel_input = ov::Tensor(ov::element::f32, {1, 1, 96000});
         std::copy(processed_audio.begin(), processed_audio.end(), mel_input.data<float>());
-        
+
         // wav2vec_input [1, 16000 * 6]
         ov::Tensor wav2vec_input = ov::Tensor(ov::element::f32, {1, 16000 * 6});
         std::copy(processed_audio.begin(), processed_audio.end(), wav2vec_input.data<float>());
@@ -68,4 +73,3 @@ namespace spark_tts
     }
 
 } // namespace spark_tts
-

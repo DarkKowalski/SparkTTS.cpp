@@ -6,17 +6,23 @@
 #include <vector>
 #include <tuple>
 
-namespace spark_tts {
-    class AudioTokenizer {
+namespace spark_tts
+{
+    class AudioTokenizer
+    {
     public:
-        AudioTokenizer(ov::Core& core, const std::string& model_path, const std::string& device_name);
+        AudioTokenizer(ov::Core &core,
+                       const std::string &wav2vec_model_path,
+                       const std::string &mel_spectrogram_model_path,
+                       const std::string &bicodec_tokenizer_model_path,
+                       const std::string &device_name);
 
     public:
         // semantic_tokens, global_tokens
-        std::pair<ov::Tensor, ov::Tensor> tokenize(const std::vector<float>& mono_audio);
+        std::pair<ov::Tensor, ov::Tensor> tokenize(const std::vector<float> &mono_audio);
 
     private:
-        std::array<float, 16000 * 6> pad_or_trim_audio(const std::vector<float>& mono_audio) const;
+        std::array<float, 16000 * 6> pad_or_trim_audio(const std::vector<float> &mono_audio) const;
 
     private:
         ov::CompiledModel wav2vec_;

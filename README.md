@@ -1,4 +1,4 @@
-# SparkTTS with OpenVINO
+# SparkTTS with OpenVINO/llama.cpp
 
 ## How to build
 

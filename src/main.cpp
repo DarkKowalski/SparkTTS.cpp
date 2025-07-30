@@ -1,12 +1,12 @@
 #include <openvino/openvino.hpp>
-#include <openvino/genai/llm_pipeline.hpp>
-#include <openvino/genai/tokenizer.hpp>
 #include <llama-cpp.h>
 
 #include <sndfile.hh>
 
 #include <argparse/argparse.hpp>
 
+#include <atomic>
+#include <thread>
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -14,41 +14,55 @@
 #include <fstream>
 #include <functional>
 
-#include "audio_tokenizer.h"
-#include "audio_detokenizer.h"
-#include "prompt.h"
-#include "utils.h"
-
-#include "transformer.h"
+#include "synthesizer.h"
 
 int main(int argc, char *argv[])
 {
-
     try
     {
-        //ggml_backend_load_all();
-        llama_backend_init();
-        auto callback = [](std::string &text)
+
+        spark_tts::Synthesizer synthesizer;
+
+        synthesizer.init_voice_feature_extraction(
+            "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml",
+            "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml",
+            "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml",
+            "CPU");
+
+        synthesizer.init_text_to_speech(
+            "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml",
+            "./models/Spark-TTS-0.5B/GGUF/LLM-507M-Q4_K.gguf",
+            "./models/Spark-TTS-0.5B/LLM/",
+            "CPU");
+
+        const std::string text = "Hi how are you";
+        std::vector<float> audio_data(16000 * 1, 0.1f); // Dummy audio data, replace with actual audio data
+
+        auto voice_features = synthesizer.extract_voice_features(audio_data);
+        for (const auto &feature : voice_features)
         {
-            std::cout << "Decoded text: " << text << std::endl;
+            std::cout << feature << " ";
+        }
+        std::cout << std::endl;
+
+
+        spark_tts::Synthesizer::TextToSpeechCallback callback = [](std::vector<float> &audio_output) -> bool
+        {
+            // Here you can process the audio output, e.g., play it or save it to a file
+            std::cout << "Generated audio data size: " << audio_output.size() << std::endl;
+            for (const auto &sample : audio_output)
+            {
+                std::cout << sample << " ";
+            }
+            std::cout << std::endl;
+            return true; // Return true to continue generating, false to stop
         };
 
-        auto llm = std::make_unique<spark_tts::Transformer>("./models/Spark-TTS-0.5B/GGUF/LLM-507M-F16.gguf", callback);
+        synthesizer.text_to_speech(text, voice_features, 5, callback);
 
-        std::string prompt = "<|task_tts|><|start_content|>Hi how are you<|end_content|><|start_global_token|><|bicodec_global_3363|><|bicodec_global_2367|><|bicodec_global_1591|><|bicodec_global_3625|><|bicodec_global_294|><|bicodec_global_3556|><|bicodec_global_1198|><|bicodec_global_2646|><|bicodec_global_3397|><|bicodec_global_3778|><|bicodec_global_2459|><|bicodec_global_3109|><|bicodec_global_1017|><|bicodec_global_3860|><|bicodec_global_3178|><|bicodec_global_3414|><|bicodec_global_1727|><|bicodec_global_561|><|bicodec_global_1096|><|bicodec_global_3133|><|bicodec_global_3647|><|bicodec_global_3178|><|bicodec_global_2767|><|bicodec_global_73|><|bicodec_global_2418|><|bicodec_global_1838|><|bicodec_global_3645|><|bicodec_global_2338|><|bicodec_global_2427|><|bicodec_global_2144|><|bicodec_global_306|><|bicodec_global_2799|><|end_global_token|>";
-
-        llm->infer(prompt, 3000, 50);
-
-        llama_backend_free();
-    }
-    catch (const std::exception &e)
+    } catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
-    }
-    catch (...)
-    {
-        std::cerr << "An unknown error occurred." << std::endl;
         return 1;
     }
 
