@@ -1,6 +1,10 @@
 {
   "dependencies": [
     "libsndfile",
-    "argparse"
+    "argparse",
+    {
+      "name": "onnxruntime-gpu",
+      "version>=": "1.19.2"
+    }
   ]
 }

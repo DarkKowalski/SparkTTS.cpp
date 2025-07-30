@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
 
     try
     {
+        //ggml_backend_load_all();
         llama_backend_init();
         auto callback = [](std::string &text)
         {

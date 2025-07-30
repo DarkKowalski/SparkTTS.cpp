@@ -159,6 +159,7 @@ $RECYCLE.BIN/
 /build
 /install
 /models
+/onnx_models
 /third_party/openvino
 /lib
 *.wav
