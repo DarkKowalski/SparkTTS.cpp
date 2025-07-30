@@ -35,28 +35,34 @@ int main(int argc, char *argv[])
             "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml",
             "./models/Spark-TTS-0.5B/GGUF/LLM-507M-F16.gguf",
             "./models/Spark-TTS-0.5B/LLM/",
+            2048, // transformer_n_ctx
+            5,    // overlapped_semantic_tokens
+            10,   // callback_semantic_tokens, 0 for immediate callback
             "CPU");
 
         const std::string text = "根据统计数据，法国奥德省人口第四多的是哪个市镇？";
 
         auto voice_features = synthesizer.extract_voice_features(ref_audio);
 
-        std::vector<float> generated;
-        spark_tts::Synthesizer::TextToSpeechCallback callback = [&generated](std::vector<float> &audio_output) -> bool
+        for (int i = 0; i < 10; i++)
         {
-            generated.insert(generated.end(), audio_output.begin(), audio_output.end());
-            return true; // Return true to continue generating, false to stop
-        };
+            std::vector<float> generated;
+            spark_tts::Synthesizer::TextToSpeechCallback callback = [&generated](std::vector<float> &audio_output) -> bool
+            {
+                generated.insert(generated.end(), audio_output.begin(), audio_output.end());
+                return true; // Return true to continue generating, false to stop
+            };
 
-        std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-        synthesizer.text_to_speech(text, voice_features, 100, callback);
-        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end_time - start_time;
+            std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+            synthesizer.text_to_speech(text, voice_features, 100, false, callback);
+            std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> elapsed_seconds = end_time - start_time;
 
-        std::cout << "Text-to-speech generation took " << elapsed_seconds.count() << " seconds." << std::endl;
-        std::cout << "Generated audio seconds: " << generated.size() / 16000.0 << " seconds." << std::endl;
+            std::cout << "Text-to-speech generation took " << elapsed_seconds.count() << " seconds." << std::endl;
+            std::cout << "Generated audio seconds: " << generated.size() / 16000.0 << " seconds." << std::endl;
 
-        spark_tts::save_generated_audio("output.wav", generated);
+            spark_tts::save_generated_audio("output_" + std::to_string(i) + ".wav", generated);
+        }
     }
     catch (const std::exception &e)
     {

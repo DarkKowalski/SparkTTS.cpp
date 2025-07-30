@@ -23,7 +23,12 @@ add_library(tts_api SHARED
     api.cpp
 )
 
-target_compile_definitions(spark_tts PRIVATE
+add_executable(c_spark_tts
+    main.c
+    utils.cpp
+)
+
+target_compile_definitions(tts_api PRIVATE
     -DSPARK_TTS_SHARED
     -DSPARK_TTS_BUILD
 )
@@ -42,6 +47,11 @@ target_link_libraries(tts_api PRIVATE
     llama
 )
 
+target_link_libraries(c_spark_tts PRIVATE 
+    tts_api
+    SndFile::sndfile
+)
+
 install(TARGETS spark_tts
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION bin
@@ -52,4 +62,9 @@ install_openvino("${CMAKE_INSTALL_PREFIX}/bin")
 
 install(TARGETS tts_api
     LIBRARY DESTINATION bin
+    ARCHIVE DESTINATION lib
+)
+
+install(TARGETS c_spark_tts
+    RUNTIME DESTINATION bin
 )

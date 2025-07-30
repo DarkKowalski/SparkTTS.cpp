@@ -44,6 +44,7 @@ namespace spark_tts
         void init_text_to_speech(const std::string &audio_detokenizer_model_path,
                                  const std::string &transformer_model_path,
                                  const std::string &tokenizer_path,
+                                 const uint32_t transformer_n_ctx,
                                  const size_t overlapped_semantic_tokens,
                                  const size_t callback_semantic_tokens,
                                  const std::string &device_name);
@@ -55,6 +56,7 @@ namespace spark_tts
             const std::string &text,
             std::array<int32_t, 32> &voice_features,
             const size_t n_sec, // max number of seconds to generate
+            const bool drop_last,
             TextToSpeechCallback &callback);
 
     private:
@@ -72,9 +74,9 @@ namespace spark_tts
         std::unique_ptr<Transformer> transformer_;
         std::unique_ptr<TokenBuffer> token_buffer_;
 
-        bool first_sample_generated_; // Flag to indicate if the first sample has been generated
+        bool first_sample_generated_;       // Flag to indicate if the first sample has been generated
         size_t overlapped_semantic_tokens_; // Number of tokens to overlap between generations
-        size_t callback_semantic_tokens_;  // Number of tokens to trigger callback, 0 for immediate callback
+        size_t callback_semantic_tokens_;   // Number of tokens to trigger callback, 0 for immediate callback
     };
 
 } // namespace spark_tts

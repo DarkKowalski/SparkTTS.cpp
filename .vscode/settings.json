@@ -96,6 +96,8 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "api.h": "c",
+        "resumable": "cpp"
     }
 }

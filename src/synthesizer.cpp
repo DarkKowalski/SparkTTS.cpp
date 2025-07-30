@@ -13,19 +13,25 @@ namespace spark_tts
     void Synthesizer::init_text_to_speech(const std::string &audio_detokenizer_model_path,
                                           const std::string &transformer_model_path,
                                           const std::string &tokenizer_path,
+                                          const uint32_t transformer_n_ctx,
                                           const size_t overlapped_semantic_tokens,
                                           const size_t callback_semantic_tokens,
                                           const std::string &device_name)
     {
+        if (overlapped_semantic_tokens >= 50 || callback_semantic_tokens >= 50)
+        {
+            throw std::invalid_argument("overlapped/callback semantic tokens must be less than 50");
+        }
+        overlapped_semantic_tokens_ = overlapped_semantic_tokens;
+        callback_semantic_tokens_ = callback_semantic_tokens;
 
         audio_detokenizer_ = std::make_unique<AudioDetokenizer>(core_, audio_detokenizer_model_path, device_name);
 
-        transformer_ = std::make_unique<Transformer>(transformer_model_path, tokenizer_path, Transformer::Params());
+        auto transformer_params = Transformer::Params();
+        transformer_params.ctx_params.n_ctx = transformer_n_ctx;
+        transformer_ = std::make_unique<Transformer>(transformer_model_path, tokenizer_path, transformer_params);
 
         token_buffer_ = std::make_unique<TokenBuffer>(50, overlapped_semantic_tokens_);
-
-        overlapped_semantic_tokens_ = overlapped_semantic_tokens;
-        callback_semantic_tokens_ = callback_semantic_tokens;
     }
 
     // Must call init_voice_feature_extraction before this method
@@ -52,7 +58,7 @@ namespace spark_tts
 
         ov::Tensor semantic_tokens_tensor(ov::element::i64, {1, 50});
         ov::Tensor global_tokens_tensor(ov::element::i32, {1, 1, 32});
-        std::copy(front_buffer.begin(), front_buffer.end() - trim_mask, semantic_tokens_tensor.data<int64_t>());
+        std::copy(front_buffer.begin(), front_buffer.end(), semantic_tokens_tensor.data<int64_t>());
         std::copy(voice_features.begin(), voice_features.end(), global_tokens_tensor.data<int32_t>());
 
         token_buffer_->flip();
@@ -90,7 +96,11 @@ namespace spark_tts
     }
 
     // Must call init_text_to_speech before this method
-    void Synthesizer::text_to_speech(const std::string &text, std::array<int32_t, 32> &voice_features, const size_t n_sec, TextToSpeechCallback &callback)
+    void Synthesizer::text_to_speech(const std::string &text,
+                                     std::array<int32_t, 32> &voice_features,
+                                     const size_t n_sec,
+                                     const bool drop_last,
+                                     TextToSpeechCallback &callback)
     {
         const std::string prompt = assemble_prompt(stringify_global_tokens(voice_features), text);
         const size_t n_predict = n_sec * (50 + overlapped_semantic_tokens_);
@@ -103,7 +113,13 @@ namespace spark_tts
         };
 
         first_sample_generated_ = false;
+        token_buffer_->clear(); // Clear the token buffer before starting a new inference
         transformer_->infer(prompt, n_predict, callback_semantic_tokens_, decode_cb);
+
+        if (drop_last)
+        {
+            return;
+        }
 
         std::vector<float> last_audio_output;
         if (synthesize(voice_features, last_audio_output))

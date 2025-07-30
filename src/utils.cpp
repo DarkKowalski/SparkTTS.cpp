@@ -51,3 +51,38 @@ namespace spark_tts
     }
 
 } // namespace spark_tts
+
+extern "C"
+{
+
+    float *util_load_reference_audio(const char *file_path, size_t *audio_size)
+    {
+        try
+        {
+            auto audio_data = spark_tts::load_reference_audio(file_path);
+            float *audio_array = (float *)std::malloc(audio_data.size() * sizeof(float));
+            std::copy(audio_data.begin(), audio_data.end(), audio_array);
+            *audio_size = audio_data.size();
+            return audio_array;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "Error loading reference audio: " << e.what() << std::endl;
+            return nullptr;
+        }
+    }
+
+    size_t util_save_generated_audio(const char *output_path, const float *audio_data, size_t audio_size)
+    {
+        try
+        {
+            std::vector<float> audio_vector(audio_data, audio_data + audio_size);
+            return spark_tts::save_generated_audio(output_path, audio_vector);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "Error saving generated audio: " << e.what() << std::endl;
+            return 0;
+        }
+    }
+}

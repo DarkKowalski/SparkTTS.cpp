@@ -70,6 +70,7 @@ namespace spark_tts
     void Transformer::infer(const std::string &prompt, const size_t n_predict, const size_t callback_tokens, DecodeCallback &callback)
     {
         sampler_->reset();
+        llama_memory_clear(llama_get_memory(ctx_), true);
 
         size_t n_total = 0;
         size_t n_callback = 0;

@@ -31,11 +31,15 @@ namespace spark_tts
         {
             front_buffer().insert(front_buffer().end(), semantic_tokens.begin(), semantic_tokens.begin() + remaining_space);
 
-            // save remaining tokens and overlapped tokens to back buffer
-            back_buffer().insert(back_buffer().end(), semantic_tokens.begin() + remaining_space - overlapped_tokens_, semantic_tokens.end());
+            // save overlapped tokens to back buffer
+            back_buffer().insert(back_buffer().end(), front_buffer().end() - overlapped_tokens_, front_buffer().end());
+            // save remaining tokens to back buffer
+            back_buffer().insert(back_buffer().end(), semantic_tokens.begin() + remaining_space, semantic_tokens.end());
 
             return true; // Buffer is full
         }
+
+        return false; // Should not reach here
     }
 
 

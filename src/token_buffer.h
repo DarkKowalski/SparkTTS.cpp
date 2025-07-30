@@ -16,6 +16,13 @@ namespace spark_tts
         // semantic_tokens size won't exceed capacity
         bool add_tokens(const std::vector<int64_t> &semantic_tokens);
 
+        void clear()
+        {
+            front_buffer().clear();
+            back_buffer().clear();
+            front_buffer_index_ = 0;
+        }
+
         void flip()
         {
             // clear and swap buffers
@@ -30,6 +37,7 @@ namespace spark_tts
         {
             return buffers_[1 - front_buffer_index_];
         }
+        
 
     private:
         // Front buffer is the working buffer where new tokens are added.
