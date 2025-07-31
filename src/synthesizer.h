@@ -64,7 +64,7 @@ namespace spark_tts
                                                           std::array<int32_t, 32> &voice_features,
                                                           TextToSpeechCallback &callback);
 
-        bool synthesize(const std::array<int32_t, 32> &voice_features, std::vector<float> &generated_audio);
+        std::vector<float> synthesize(const std::array<int32_t, 32> &voice_features);
 
     private:
         ov::Core core_;
@@ -74,9 +74,15 @@ namespace spark_tts
         std::unique_ptr<Transformer> transformer_;
         std::unique_ptr<TokenBuffer> token_buffer_;
 
-        bool first_sample_generated_;       // Flag to indicate if the first sample has been generated
         size_t overlapped_semantic_tokens_; // Number of tokens to overlap between generations
-        size_t callback_semantic_tokens_;   // Number of tokens to trigger callback, 0 for immediate callback
+                                            // Tradeoff between quality and throughput
+                                            // 0 to 25, 3 to 5 is good for most cases
+
+        size_t callback_semantic_tokens_; // Number of tokens to trigger callback, 0 for immediate callback
+                                          // Tradeoff between latency and throughput
+                                          // 0 to 50
+
+        size_t synthesized_frames_; // Number of frames synthesized for the current text
     };
 
 } // namespace spark_tts

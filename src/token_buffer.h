@@ -6,6 +6,14 @@
 
 namespace spark_tts
 {
+    // Overlap semantic tokens to eliminate voice gaps
+    // Example: overlapped = 1
+    // |---audio decoder input---|
+    //      |-----valid-----|trim|
+    // | 01 | 02 | ... | 49 | 50 |
+    //                 | 01 | 02 | ... | 49 | 50 |
+    //                 |trim|-----valid-----|
+
     class TokenBuffer
     {
     public:
@@ -16,28 +24,14 @@ namespace spark_tts
         // semantic_tokens size won't exceed capacity
         bool add_tokens(const std::vector<int64_t> &semantic_tokens);
 
-        void clear()
-        {
-            front_buffer().clear();
-            back_buffer().clear();
-            front_buffer_index_ = 0;
-        }
+        void clear(); // Clear all buffers and reset the front buffer index
 
-        void flip()
-        {
-            // clear and swap buffers
-            front_buffer().clear();
-            front_buffer_index_ = 1 - front_buffer_index_;
-        }
+        void flip(); // Clear the front buffer and swap it with the back buffer
 
-        std::vector<int64_t> &front_buffer() { return buffers_[front_buffer_index_]; }
+        std::vector<int64_t> &front_buffer();
 
     private:
-        std::vector<int64_t> &back_buffer()
-        {
-            return buffers_[1 - front_buffer_index_];
-        }
-        
+        std::vector<int64_t> &back_buffer();
 
     private:
         // Front buffer is the working buffer where new tokens are added.

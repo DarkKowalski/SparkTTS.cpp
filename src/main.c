@@ -47,11 +47,11 @@ int main(void)
 
     tts_init_text_to_speech(ctx,
                             "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml",
-                            "./models/Spark-TTS-0.5B/GGUF/LLM-507M-F16.gguf",
-                            "./models/Spark-TTS-0.5B/LLM/",
+                            "./models/Spark-TTS-0.5B/Transformer/model_f16.gguf",
+                            "./models/Spark-TTS-0.5B/Tokenizer/",
                             2048, // transformer_n_ctx
-                            5,    // overlapped_semantic_tokens
-                            5,    // callback_semantic_tokens, 0 for immediate callback
+                            3,    // overlapped_semantic_tokens
+                            10,   // callback_semantic_tokens, 0 for immediate callback
                             "CPU");
 
     size_t voice_features_size;
