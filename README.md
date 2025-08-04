@@ -30,6 +30,15 @@ cmake --install build --config Release
 cd ..\..
 ```
 
+#### macOS (Apple Silicon)
+
+```bash
+pushd third_party/llama.cpp
+cmake -B build -G Ninja -DLLAMA_CURL=OFF -DCMAKE_INSTALL_PREFIX=../../lib/llama
+cmake --build build --config Release
+cmake --install build --config Release
+popd
+```
 
 ### Build with CMake and Ninja
 
@@ -39,4 +48,12 @@ cd ..\..
 cmake --preset=vcpkg -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 cmake --install build --config Release && copy /Y build\src\*.dll install\bin
+```
+
+#### macOS
+
+```bash
+cmake --preset=vcpkg -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+cmake --install build --config Release
 ```

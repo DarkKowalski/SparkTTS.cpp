@@ -21,7 +21,11 @@ function(install_openvino dest_dir)
             install(FILES ${THIRD_PARTY_LIB_FILES} DESTINATION ${dest_dir})
         endif()
     elseif (APPLE)
-        # not implemented yet
-        message(FATAL_ERROR "OpenVINO installation for macOS is not implemented yet.")
+        file(GLOB_RECURSE LIB_FILES "${OPENVINO_ROOT_DIR}/runtime/lib/arm64/Release/*.dylib")
+        install(FILES ${LIB_FILES} DESTINATION ${dest_dir})
+
+        # Third-party libraries
+        file(GLOB_RECURSE THIRD_PARTY_LIB_FILES "${OPENVINO_ROOT_DIR}/runtime/3rdparty/tbb/lib/*.dylib")
+        install(FILES ${THIRD_PARTY_LIB_FILES} DESTINATION ${dest_dir})
     endif()
 endfunction(install_openvino)

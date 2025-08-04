@@ -24,6 +24,9 @@ extern "C"
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
     typedef bool (*tts_synthesis_callback)(void *user_data, const float *audio_data, const size_t audio_size); // return true to continue decoding, false to stop
     typedef struct tts_context tts_context;

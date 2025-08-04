@@ -10,7 +10,7 @@ namespace spark_tts
     {
 
         // Initialize the model
-        model_ = llama_load_model_from_file(model_path.c_str(), model_params_);
+        model_ = llama_model_load_from_file(model_path.c_str(), model_params_);
         if (!model_)
         {
             throw std::runtime_error("Failed to load model from file: " + model_path);

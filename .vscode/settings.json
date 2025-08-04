@@ -98,6 +98,16 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "api.h": "c",
-        "resumable": "cpp"
+        "resumable": "cpp",
+        "__locale": "cpp",
+        "__verbose_abort": "cpp",
+        "print": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__node_handle": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "execution": "cpp",
+        "string_view": "cpp"
     }
 }

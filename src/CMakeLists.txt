@@ -33,6 +33,30 @@ target_compile_definitions(tts_api PRIVATE
     -DSPARK_TTS_BUILD
 )
 
+if (APPLE)
+    # Set the install name for the shared library on macOS
+    set_target_properties(tts_api PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "@loader_path/."
+        MACOSX_RPATH TRUE
+    )
+
+    set_target_properties(spark_tts PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "@loader_path/."
+        MACOSX_RPATH TRUE
+    )
+
+    set_target_properties(c_spark_tts PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "@loader_path/."
+        MACOSX_RPATH TRUE
+    )
+endif()
+
 target_link_libraries(spark_tts PRIVATE 
     openvino::runtime
     openvino::genai
