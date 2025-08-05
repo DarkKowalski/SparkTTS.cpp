@@ -9,6 +9,14 @@ project(spark_tts
     LANGUAGES C CXX
 )
 
+if(APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 15.0)
+    include(ONNXRuntime)
+    find_onnxruntime()
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)

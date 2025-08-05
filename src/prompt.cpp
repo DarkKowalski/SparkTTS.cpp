@@ -15,18 +15,6 @@ namespace spark_tts
         return oss.str();
     }
 
-    std::string stringify_global_tokens(const ov::Tensor &global_tokens)
-    {
-        std::ostringstream oss;
-        auto global_token_ids = global_tokens.data<int32_t>();
-        for (size_t i = 0; i < global_tokens.get_size(); ++i)
-        {
-            oss << "<|bicodec_global_" << global_token_ids[i] << "|>";
-        }
-
-        return oss.str();
-    }
-
     std::string assemble_prompt(const std::string &global_token_input, const std::string &text)
     {
         std::ostringstream oss;

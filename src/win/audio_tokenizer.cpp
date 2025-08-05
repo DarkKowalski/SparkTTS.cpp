@@ -37,7 +37,7 @@ namespace spark_tts
         return padded_audio;
     }
 
-    std::pair<ov::Tensor, ov::Tensor> AudioTokenizer::tokenize(const std::vector<float> &mono_audio)
+    std::array<int32_t, 32> AudioTokenizer::tokenize(const std::vector<float> &mono_audio)
     {
         auto processed_audio = pad_or_trim_audio(mono_audio);
 
@@ -66,10 +66,12 @@ namespace spark_tts
         bicodec_tokenizer_infer.infer();
 
         // Get outputs
-        auto semantic_tokens = bicodec_tokenizer_infer.get_output_tensor(0);
+        // auto semantic_tokens = bicodec_tokenizer_infer.get_output_tensor(0);
         auto global_tokens = bicodec_tokenizer_infer.get_output_tensor(1);
 
-        return {semantic_tokens, global_tokens};
+        std::array<int32_t, 32> global_token_ids = {};
+        std::copy(global_tokens.data<int32_t>(), global_tokens.data<int32_t>() + 32, global_token_ids.begin());
+        return global_token_ids;
     }
 
 } // namespace spark_tts

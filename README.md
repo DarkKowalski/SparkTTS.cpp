@@ -40,6 +40,24 @@ cmake --install build --config Release
 popd
 ```
 
+### Build ONNX Runtime (macOS only)
+
+```bash
+pushd third_party/onnxruntime
+python ./tools/ci_build/build.py \
+    --update \
+    --build \
+    --config Release \
+    --build_shared_lib \
+    --parallel \
+    --build_dir ./build \
+    --cmake_extra_defines "CMAKE_POLICY_VERSION_MINIMUM=3.5" \
+    --skip_tests \
+    --enable_lto
+cmake --install build/Release --config Release --prefix ../../lib/onnxruntime
+popd
+```
+
 ### Build with CMake and Ninja
 
 #### Windows

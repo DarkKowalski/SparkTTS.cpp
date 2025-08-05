@@ -160,6 +160,7 @@ $RECYCLE.BIN/
 /install
 /models
 /onnx_models
+/coreml_models
 /third_party/openvino
 /lib
 *.wav

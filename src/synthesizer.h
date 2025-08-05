@@ -9,11 +9,12 @@
 #include <string>
 #include <array>
 
-#include "audio_tokenizer.h"
-#include "audio_detokenizer.h"
 #include "transformer.h"
 #include "prompt.h"
 #include "token_buffer.h"
+
+#include "audio_tokenizer.h"
+#include "audio_detokenizer.h"
 
 namespace spark_tts
 {
@@ -64,13 +65,13 @@ namespace spark_tts
                                                           std::array<int32_t, 32> &voice_features,
                                                           TextToSpeechCallback &callback);
 
-        std::vector<float> synthesize(const std::array<int32_t, 32> &voice_features);
+        std::vector<float> synthesize(std::array<int32_t, 32> &voice_features);
 
     private:
         ov::Core core_;
 
-        std::unique_ptr<AudioTokenizer> audio_tokenizer_;
-        std::unique_ptr<AudioDetokenizer> audio_detokenizer_;
+        std::unique_ptr<IAudioTokenizer> audio_tokenizer_;
+        std::unique_ptr<IAudioDetokenizer> audio_detokenizer_;
         std::unique_ptr<Transformer> transformer_;
         std::unique_ptr<TokenBuffer> token_buffer_;
 

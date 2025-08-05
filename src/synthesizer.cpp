@@ -1,5 +1,13 @@
 #include "synthesizer.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#include "win/audio_detokenizer.h"
+#include "win/audio_tokenizer.h"
+#elif defined(__APPLE__)
+#include "mac/audio_detokenizer.h"
+#include "mac/audio_tokenizer.h"
+#endif
+
 namespace spark_tts
 {
     void Synthesizer::init_voice_feature_extraction(const std::string &wav2vec_model_path,
@@ -7,7 +15,11 @@ namespace spark_tts
                                                     const std::string &bicodec_tokenizer_model_path,
                                                     const std::string &device_name)
     {
+#if defined(_WIN32) || defined(_WIN64)
         audio_tokenizer_ = std::make_unique<AudioTokenizer>(core_, wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path, device_name);
+#elif defined(__APPLE__)
+        audio_tokenizer_ = std::make_unique<AudioTokenizer>(wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path);
+#endif
     }
 
     void Synthesizer::init_text_to_speech(const std::string &audio_detokenizer_model_path,
@@ -25,7 +37,11 @@ namespace spark_tts
         overlapped_semantic_tokens_ = overlapped_semantic_tokens;
         callback_semantic_tokens_ = callback_semantic_tokens;
 
+#if defined(_WIN32) || defined(_WIN64)
         audio_detokenizer_ = std::make_unique<AudioDetokenizer>(core_, audio_detokenizer_model_path, device_name);
+#elif defined(__APPLE__)
+        audio_detokenizer_ = std::make_unique<AudioDetokenizer>(audio_detokenizer_model_path);
+#endif
 
         auto transformer_params = Transformer::Params();
         transformer_params.ctx_params.n_ctx = transformer_n_ctx;
@@ -37,15 +53,10 @@ namespace spark_tts
     // Must call init_voice_feature_extraction before this method
     std::array<int32_t, 32> Synthesizer::extract_voice_features(const std::vector<float> &audio_data)
     {
-        auto [semantic_tokens, global_tokens] = audio_tokenizer_->tokenize(audio_data);
-
-        std::array<int32_t, 32> voice_features = {};
-        std::copy(global_tokens.data<int32_t>(), global_tokens.data<int32_t>() + 32, voice_features.begin());
-
-        return voice_features;
+        return audio_tokenizer_->tokenize(audio_data);
     }
 
-    std::vector<float> Synthesizer::synthesize(const std::array<int32_t, 32> &voice_features)
+    std::vector<float> Synthesizer::synthesize(std::array<int32_t, 32> &voice_features)
     {
         const std::vector<int64_t> &front_buffer = token_buffer_->front_buffer();
         if (front_buffer.size() <= overlapped_semantic_tokens_)
@@ -54,10 +65,8 @@ namespace spark_tts
             return {};
         }
 
-        ov::Tensor semantic_tokens_tensor(ov::element::i64, {1, 50});
-        ov::Tensor global_tokens_tensor(ov::element::i32, {1, 1, 32});
-        std::copy(front_buffer.begin(), front_buffer.end(), semantic_tokens_tensor.data<int64_t>());
-        std::copy(voice_features.begin(), voice_features.end(), global_tokens_tensor.data<int32_t>());
+        std::array<int64_t, 50> semantic_tokens_array = {};
+        std::copy(front_buffer.begin(), front_buffer.end(), semantic_tokens_array.begin());
 
         // If buffer is not full, it must be the last generation, don't trim the tail
         const size_t tail_trim_tokens = front_buffer.size() == 50 ? overlapped_semantic_tokens_ : 50 - front_buffer.size();
@@ -67,7 +76,7 @@ namespace spark_tts
 
         token_buffer_->flip();
 
-        auto sample = audio_detokenizer_->detokenize(semantic_tokens_tensor, global_tokens_tensor);
+        auto sample = audio_detokenizer_->detokenize(semantic_tokens_array, voice_features);
 
         constexpr size_t samples_per_token = 320; // 50 tokens per second, 320 samples per token
         std::vector<float> generated_audio(sample.begin() + head_trim_tokens * samples_per_token,

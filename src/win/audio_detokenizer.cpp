@@ -10,11 +10,17 @@ namespace spark_tts
 
     // Semantic tokens [1, 50] i64
     // Global tokens [1, 1, 32] i32
-    std::array<float, 16000 * 1> AudioDetokenizer::detokenize(const ov::Tensor &semantic_tokens, const ov::Tensor &global_tokens)
+    std::array<float, 16000 * 1> AudioDetokenizer::detokenize(std::array<int64_t, 50> &semantic_tokens,
+                                                              std::array<int32_t, 32> &global_tokens)
     {
+        ov::Tensor semantic_tokens_tensor(ov::element::i64, {1, 50});
+        ov::Tensor global_tokens_tensor(ov::element::i32, {1, 1, 32});
+        std::copy(semantic_tokens.begin(), semantic_tokens.end(), semantic_tokens_tensor.data<int64_t>());
+        std::copy(global_tokens.begin(), global_tokens.end(), global_tokens_tensor.data<int32_t>());
+
         ov::InferRequest infer_request = bicodec_detokenizer_.create_infer_request();
-        infer_request.set_input_tensor(0, semantic_tokens);
-        infer_request.set_input_tensor(1, global_tokens);
+        infer_request.set_input_tensor(0, semantic_tokens_tensor);
+        infer_request.set_input_tensor(1, global_tokens_tensor);
         infer_request.infer();
 
         auto output_tensor = infer_request.get_output_tensor();

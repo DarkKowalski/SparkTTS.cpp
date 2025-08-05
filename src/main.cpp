@@ -19,21 +19,35 @@
 
 int main(int argc, char *argv[])
 {
-
     auto ref_audio = spark_tts::load_reference_audio("prompt_audio.wav");
 
     spark_tts::Synthesizer synthesizer;
 
+    // FIXME: Development purpose only, to be removed later
+#if defined(_WIN32) || defined(_WIN64)
+    const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml";
+    const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml";
+    const std::string bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml";
+    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml";
+#elif defined(__APPLE__)
+    const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.onnx";
+    const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.onnx";
+    const std::string bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.onnx";
+    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.onnx";
+#endif
+    const std::string transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_f16.gguf";
+    const std::string tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/";
+
     synthesizer.init_voice_feature_extraction(
-        "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml",
-        "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml",
-        "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml",
+        wav2vec_model_path,
+        mel_spectrogram_model_path,
+        bicodec_tokenizer_model_path,
         "CPU");
 
     synthesizer.init_text_to_speech(
-        "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml",
-        "./models/Spark-TTS-0.5B/Transformer/model_f16.gguf",
-        "./models/Spark-TTS-0.5B/Tokenizer/",
+        audio_detokenizer_model_path,
+        transformer_model_path,
+        tokenizer_path,
         2048, // transformer_n_ctx
         3,    // overlapped_semantic_tokens
         10,   // callback_semantic_tokens, 0 for immediate callback
