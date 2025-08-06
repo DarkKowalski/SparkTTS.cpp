@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "libsndfile",
-    "argparse"
+    "argparse",
+    "perfetto"
   ]
 }

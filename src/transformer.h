@@ -41,7 +41,7 @@ namespace spark_tts
         };
 
     public:
-        enum class DecodeCallbackAction: uint8_t
+        enum class DecodeCallbackAction : uint8_t
         {
             Continue, // Continue decoding
             Stop,     // Stop decoding
@@ -56,9 +56,9 @@ namespace spark_tts
 
     public:
         void infer(const std::string &prompt,
-                   const size_t n_predict,      // max number of tokens to generate
+                   const size_t n_predict,       // max number of tokens to generate
                    const size_t callback_tokens, // number of tokens to trigger callback, 0 for immediate callback
-                   DecodeCallback& callback);
+                   DecodeCallback &callback);
 
     private:
         llama_context *ctx_;

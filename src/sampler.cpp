@@ -1,10 +1,14 @@
 #include "sampler.h"
 
+#include "profiler/profiler.h"
+
 namespace spark_tts
 {
     Sampler::Sampler(const SamplerParameters &params, const llama_model *model)
         : params_(params), prev_tokens_(std::max(32, params.n_prev))
     {
+        TRACE_EVENT("transformer", "Sampler::Sampler");
+
         const llama_vocab *vocab = llama_model_get_vocab(model);
         grammar_ = llama_sampler_init_grammar(vocab, params_.grammar.c_str(), "root");
         if (!grammar_)
@@ -125,12 +129,16 @@ namespace spark_tts
 
     void Sampler::reset()
     {
+        TRACE_EVENT("transformer", "Sampler::reset");
+
         llama_sampler_reset(chain_);
         llama_sampler_reset(grammar_);
     }
 
     void Sampler::accept(llama_token token, bool accept_grammar)
     {
+        TRACE_EVENT("transformer", "Sampler::accept");
+
         if (accept_grammar)
         {
             llama_sampler_accept(grammar_, token);
@@ -164,6 +172,8 @@ namespace spark_tts
 
     llama_token Sampler::sample(llama_context *ctx, int32_t idx, bool grammar_first)
     {
+        TRACE_EVENT("transformer", "Sampler::sample");
+
         set_logits(ctx, idx);
 
         if (grammar_first)

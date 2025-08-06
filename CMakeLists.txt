@@ -9,12 +9,6 @@ project(spark_tts
     LANGUAGES C CXX
 )
 
-if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 15.0)
-    include(ONNXRuntime)
-    find_onnxruntime()
-endif()
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_C_STANDARD 11)
@@ -26,7 +20,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if (APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 15.0)
+endif()
+
 # Third-party dependencies
+if(APPLE)
+    include(ONNXRuntime)
+    find_onnxruntime()
+endif()
+
+option(ENABLE_PERFETTO "Enable Perfetto tracing" OFF)
+if (ENABLE_PERFETTO)
+    message(STATUS "Perfetto tracing is enabled.")
+    find_package(Threads)
+    find_package(unofficial-perfetto CONFIG REQUIRED)
+endif()
+
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 find_package(OpenVINOGenAI REQUIRED)
 find_package(SndFile CONFIG REQUIRED)

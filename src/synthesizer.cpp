@@ -8,13 +8,38 @@
 #include "mac/audio_tokenizer.h"
 #endif
 
+#include "profiler/profiler.h"
+
 namespace spark_tts
 {
+
+    Synthesizer::Synthesizer() : core_(ov::Core())
+    {
+        Profiler::instance().start(1024 * 32); // Start profiler with 32 MB buffer size
+
+        {
+            TRACE_EVENT("synthesizer", "Initialize llama backend");
+            llama_backend_init();
+        }
+    }
+
+    Synthesizer::~Synthesizer()
+    {
+        {
+            TRACE_EVENT("synthesizer", "Unload llama backend");
+            llama_backend_free();
+        }
+
+        Profiler::instance().stop("spark_tts.pftrace"); // Stop profiler and write trace to file
+    }
+
     void Synthesizer::init_voice_feature_extraction(const std::string &wav2vec_model_path,
                                                     const std::string &mel_spectrogram_model_path,
                                                     const std::string &bicodec_tokenizer_model_path,
                                                     const std::string &device_name)
     {
+        TRACE_EVENT("synthesizer", "init_voice_feature_extraction");
+
 #if defined(_WIN32) || defined(_WIN64)
         audio_tokenizer_ = std::make_unique<AudioTokenizer>(core_, wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path, device_name);
 #elif defined(__APPLE__)
@@ -30,6 +55,8 @@ namespace spark_tts
                                           const size_t callback_semantic_tokens,
                                           const std::string &device_name)
     {
+        TRACE_EVENT("synthesizer", "init_text_to_speech");
+
         if (overlapped_semantic_tokens > 25 || callback_semantic_tokens > 50)
         {
             throw std::invalid_argument("Invalid overlapped/callback semantic tokens");
@@ -53,11 +80,14 @@ namespace spark_tts
     // Must call init_voice_feature_extraction before this method
     std::array<int32_t, 32> Synthesizer::extract_voice_features(const std::vector<float> &audio_data)
     {
+        TRACE_EVENT("synthesizer", "extract_voice_features");
         return audio_tokenizer_->tokenize(audio_data);
     }
 
     std::vector<float> Synthesizer::synthesize(std::array<int32_t, 32> &voice_features)
     {
+        TRACE_EVENT("synthesizer", "synthesize");
+
         const std::vector<int64_t> &front_buffer = token_buffer_->front_buffer();
         if (front_buffer.size() <= overlapped_semantic_tokens_)
         {
@@ -92,6 +122,8 @@ namespace spark_tts
                                                                    TextToSpeechCallback &callback)
 
     {
+        TRACE_EVENT("synthesizer", "decode_callback");
+
         auto semantic_token_ids = extract_semantic_token_ids(semantic_tokens);
 
         bool ready_to_synthesize = token_buffer_->add_tokens(semantic_token_ids);
@@ -113,6 +145,8 @@ namespace spark_tts
                                      const bool drop_last,
                                      TextToSpeechCallback &callback)
     {
+        TRACE_EVENT("synthesizer", "text_to_speech");
+
         const std::string prompt = assemble_prompt(stringify_global_tokens(voice_features), text);
         const size_t n_predict = n_sec * (50 + overlapped_semantic_tokens_);
 

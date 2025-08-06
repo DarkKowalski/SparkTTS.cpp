@@ -1,4 +1,7 @@
 #include "transformer.h"
+
+#include "profiler/profiler.h"
+
 namespace spark_tts
 {
     Transformer::Transformer(const std::string &model_path,
@@ -8,30 +11,39 @@ namespace spark_tts
           model_params_(params.model_params),
           sampler_params_(params.sampler_params)
     {
+        TRACE_EVENT("transformer", "Transformer::Transformer");
 
-        // Initialize the model
-        model_ = llama_model_load_from_file(model_path.c_str(), model_params_);
-        if (!model_)
         {
-            throw std::runtime_error("Failed to load model from file: " + model_path);
+            TRACE_EVENT("transformer", "llama_model_load_from_file");
+            model_ = llama_model_load_from_file(model_path.c_str(), model_params_);
+            if (!model_)
+            {
+                throw std::runtime_error("Failed to load model from file: " + model_path);
+            }
         }
 
-        vocab_ = llama_model_get_vocab(model_);
-        if (!vocab_)
         {
-            throw std::runtime_error("Failed to get vocabulary from model");
+            TRACE_EVENT("transformer", "llama_model_get_vocab");
+            vocab_ = llama_model_get_vocab(model_);
+            if (!vocab_)
+            {
+                throw std::runtime_error("Failed to get vocabulary from model");
+            }
         }
 
         // Initialize the context
-        ctx_ = llama_init_from_model(model_, ctx_params_);
-        if (!ctx_)
         {
-            throw std::runtime_error("Failed to initialize context from model");
-        }
+            TRACE_EVENT("transformer", "llama_init_from_model");
+            ctx_ = llama_init_from_model(model_, ctx_params_);
+            if (!ctx_)
+            {
+                throw std::runtime_error("Failed to initialize context from model");
+            }
 
-        if (llama_n_ctx(ctx_) > llama_model_n_ctx_train(model_))
-        {
-            throw std::runtime_error("Context size exceeds model's training context size");
+            if (llama_n_ctx(ctx_) > llama_model_n_ctx_train(model_))
+            {
+                throw std::runtime_error("Context size exceeds model's training context size");
+            }
         }
 
         // Don't use llama.cpp tokenizer, use OpenVINO tokenizer instead
@@ -69,6 +81,8 @@ namespace spark_tts
 
     void Transformer::infer(const std::string &prompt, const size_t n_predict, const size_t callback_tokens, DecodeCallback &callback)
     {
+        TRACE_EVENT("transformer", "Transformer::infer");
+
         sampler_->reset();
         llama_memory_clear(llama_get_memory(ctx_), true);
 
@@ -83,7 +97,9 @@ namespace spark_tts
 
         while (n_total < n_predict)
         {
+            TRACE_EVENT_BEGIN("transformer", "llama_decode");
             int32_t decode_result = llama_decode(ctx_, batch);
+            TRACE_EVENT_END("transformer");
             if (decode_result != 0)
             {
                 throw std::runtime_error("Decoding failed with error code: " + std::to_string(decode_result));

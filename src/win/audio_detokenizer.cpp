@@ -1,9 +1,13 @@
 #include "audio_detokenizer.h"
 
+#include "../profiler/profiler.h"
+
 namespace spark_tts
 {
     AudioDetokenizer::AudioDetokenizer(ov::Core &core, const std::string &model_path, const std::string &device_name)
     {
+        TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::AudioDetokenizer");
+
         auto bicodec_detokenizer_model = core.read_model(model_path);
         bicodec_detokenizer_ = core.compile_model(model_path, device_name);
     }
@@ -13,6 +17,8 @@ namespace spark_tts
     std::array<float, 16000 * 1> AudioDetokenizer::detokenize(std::array<int64_t, 50> &semantic_tokens,
                                                               std::array<int32_t, 32> &global_tokens)
     {
+        TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::detokenize");
+
         ov::Tensor semantic_tokens_tensor(ov::element::i64, {1, 50});
         ov::Tensor global_tokens_tensor(ov::element::i32, {1, 1, 32});
         std::copy(semantic_tokens.begin(), semantic_tokens.end(), semantic_tokens_tensor.data<int64_t>());

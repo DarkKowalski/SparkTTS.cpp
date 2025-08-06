@@ -1,5 +1,7 @@
 #include "audio_tokenizer.h"
 
+#include "../profiler/profiler.h"
+
 namespace spark_tts
 {
     AudioTokenizer::AudioTokenizer(ov::Core &core,
@@ -8,6 +10,8 @@ namespace spark_tts
                                    const std::string &bicodec_tokenizer_model_path,
                                    const std::string &device_name)
     {
+        TRACE_EVENT("audio_tokenizer", "AudioTokenizer::AudioTokenizer");
+
         auto wav2vec_model = core.read_model(wav2vec_model_path);
         auto mel_spectrogram_model = core.read_model(mel_spectrogram_model_path);
         auto bicodec_tokenizer_model = core.read_model(bicodec_tokenizer_model_path);
@@ -19,6 +23,8 @@ namespace spark_tts
 
     std::array<float, 16000 * 6> AudioTokenizer::pad_or_trim_audio(const std::vector<float> &mono_audio) const
     {
+        TRACE_EVENT("audio_tokenizer", "AudioTokenizer::pad_or_trim_audio");
+
         std::array<float, 16000 * 6> padded_audio = {};
         size_t audio_size = mono_audio.size();
 
@@ -39,6 +45,8 @@ namespace spark_tts
 
     std::array<int32_t, 32> AudioTokenizer::tokenize(const std::vector<float> &mono_audio)
     {
+        TRACE_EVENT("audio_tokenizer", "AudioTokenizer::tokenize");
+
         auto processed_audio = pad_or_trim_audio(mono_audio);
 
         // mel_input [1, 1, 96000]

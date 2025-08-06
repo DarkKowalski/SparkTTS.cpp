@@ -25,15 +25,8 @@ namespace spark_tts
         typedef std::function<bool(std::vector<float> &)> TextToSpeechCallback; // true to continue, false to stop
 
     public:
-        Synthesizer() : core_(ov::Core())
-        {
-            llama_backend_init(); // Initialize llama backend
-        }
-
-        ~Synthesizer()
-        {
-            llama_backend_free(); // Free llama backend resources
-        }
+        Synthesizer();
+        ~Synthesizer();
 
         // Lazy initialization
     public:
