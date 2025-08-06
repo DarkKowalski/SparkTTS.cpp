@@ -1,7 +1,5 @@
 #include "audio_detokenizer.h"
 
-#include <iostream>
-
 namespace spark_tts
 {
     AudioDetokenizer::AudioDetokenizer(const std::string &model_path) : env_(ORT_LOGGING_LEVEL_ERROR, "AudioDetokenizer"),

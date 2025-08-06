@@ -1,7 +1,5 @@
 #include "audio_tokenizer.h"
 
-#include <iostream>
-
 namespace spark_tts
 {
     AudioTokenizer::AudioTokenizer(const std::string &wav2vec_model_path,

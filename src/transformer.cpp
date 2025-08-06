@@ -2,8 +2,6 @@
 
 #include "profiler/profiler.h"
 
-#include <iostream>
-
 namespace spark_tts
 {
     Transformer::Transformer(const std::string &model_path,
