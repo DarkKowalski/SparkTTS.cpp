@@ -27,7 +27,6 @@ namespace spark_tts
                 ctx_params.n_ubatch = 1;      // NVIDIA RTX4070 Vulkan backend will generate NaN logits with 512 n_ubatch.
                 ctx_params.no_perf = true;    // Disable performance metrics
                 ctx_params.flash_attn = true; // Enable flash attention
-                ctx_params.type_k = GGML_TYPE_Q8_0; // Use Q8_0 for key tensors
 
                 model_params.n_gpu_layers = 25; // Offload all layers to GPU
 
