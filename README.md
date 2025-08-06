@@ -2,11 +2,15 @@
 
 ## How to build
 
+### Install Rust
+
+[Install Rust](https://www.rust-lang.org/tools/install)
+
 ### Setup OpenVINO GenAI
 
-[Window](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_GENAI&VERSION=v_2025_2_0&OP_SYSTEM=WINDOWS&DISTRIBUTION=ARCHIVE)
+[Window](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=WINDOWS&DISTRIBUTION=ARCHIVE)
 
-[macOS](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_GENAI&VERSION=v_2025_2_0&OP_SYSTEM=MACOS&DISTRIBUTION=ARCHIVE)
+[macOS](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=MACOS&DISTRIBUTION=ARCHIVE)
 
 ### Setup vcpkg
 

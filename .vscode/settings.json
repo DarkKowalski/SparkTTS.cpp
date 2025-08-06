@@ -108,6 +108,8 @@
         "__split_buffer": "cpp",
         "__tree": "cpp",
         "execution": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "shared_mutex": "cpp",
+        "stacktrace": "cpp"
     }
 }

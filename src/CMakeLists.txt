@@ -16,8 +16,8 @@ if(WIN32)
 
     target_link_libraries(tts_api PRIVATE
         openvino::runtime
-        openvino::genai
         llama
+        tokenizers_cpp
     )
 
     target_compile_definitions(tts_api PRIVATE
@@ -81,10 +81,10 @@ if(WIN32)
 
     target_link_libraries(tts_cli PRIVATE
         openvino::runtime
-        openvino::genai
         llama
         SndFile::sndfile
         argparse::argparse
+        tokenizers_cpp
     )
 
     if(ENABLE_PERFETTO)
@@ -122,7 +122,6 @@ elseif(APPLE)
 
     target_link_libraries(tts_api PRIVATE
         openvino::runtime
-        openvino::genai
         llama
         onnxruntime
     )
@@ -209,7 +208,6 @@ elseif(APPLE)
 
     target_link_libraries(tts_cli PRIVATE
         openvino::runtime
-        openvino::genai
         llama
         SndFile::sndfile
         argparse::argparse

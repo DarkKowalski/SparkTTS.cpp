@@ -1,20 +1,19 @@
 #pragma once
 
 #include <llama-cpp.h>
-#include <openvino/openvino.hpp>
-#include <openvino/genai/tokenizer.hpp>
+#include <tokenizers_cpp.h>
 
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <fstream>
 
 namespace spark_tts
 {
     class Tokenizer
     {
     public:
-        Tokenizer(const std::string& openvino_tokenizer_path);
-        ~Tokenizer();
+        Tokenizer(const std::string &huggingface_tokenizer_path);
 
     public:
         std::vector<llama_token> tokenize(const std::string &text) const;
@@ -22,7 +21,7 @@ namespace spark_tts
         std::string token_to_piece(llama_token token) const;
 
     private:
-        ov::genai::Tokenizer* ov_tokenizer_; // OpenVINO tokenizer instance
+        std::unique_ptr<tokenizers::Tokenizer> tokenizer_;
     };
 
 } // namespace spark_tts

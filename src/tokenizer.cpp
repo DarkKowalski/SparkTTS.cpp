@@ -4,32 +4,35 @@
 
 namespace spark_tts
 {
+    static std::string load_bytes_from_file(const std::string &path)
+    {
+        std::ifstream fs(path, std::ios::in | std::ios::binary);
+        if (fs.fail())
+        {
+            throw std::runtime_error("Cannot open file: " + path);
+        }
+        std::string data;
+        fs.seekg(0, std::ios::end);
+        size_t size = static_cast<size_t>(fs.tellg());
+        fs.seekg(0, std::ios::beg);
+        data.resize(size);
+        fs.read(data.data(), size);
+        return data;
+    }
 
-    Tokenizer::Tokenizer(const std::string &openvino_tokenizer_path)
+    Tokenizer::Tokenizer(const std::string &huggingface_tokenizer_path)
     {
         TRACE_EVENT("transformer", "Tokenizer::Tokenizer");
 
-        // Initialize the tokenizer with the provided OpenVINO tokenizer path
-        ov_tokenizer_ = new ov::genai::Tokenizer(openvino_tokenizer_path);
-    }
-
-    Tokenizer::~Tokenizer()
-    {
-        if (ov_tokenizer_)
-        {
-            delete ov_tokenizer_;
-            ov_tokenizer_ = nullptr;
-        }
+        auto blob = load_bytes_from_file(huggingface_tokenizer_path);
+        tokenizer_ = tokenizers::Tokenizer::FromBlobJSON(blob);
     }
 
     std::vector<llama_token> Tokenizer::tokenize(const std::string &text) const
     {
         TRACE_EVENT("transformer", "Tokenizer::tokenize");
 
-        auto ov_tokens = ov_tokenizer_->encode(text, {{"add_special_tokens", false}});
-        std::vector<int64_t> token_ids(
-            ov_tokens.input_ids.data<int64_t>(),
-            ov_tokens.input_ids.data<int64_t>() + ov_tokens.input_ids.get_size());
+        auto token_ids = tokenizer_->Encode(text);
         // NOTE: OpenVINO tokenizer uses int64_t for token IDs, while llama_token is typically int32_t.
         std::vector<llama_token> llama_tokens(token_ids.begin(), token_ids.end());
         return llama_tokens;
@@ -39,6 +42,6 @@ namespace spark_tts
     {
         TRACE_EVENT("transformer", "Tokenizer::token_to_piece");
 
-        return ov_tokenizer_->decode({token});
+        return tokenizer_->Decode({token});
     }
 } // namespace spark_tts

@@ -38,9 +38,12 @@ if (ENABLE_PERFETTO)
 endif()
 
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
-find_package(OpenVINOGenAI REQUIRED)
 find_package(SndFile CONFIG REQUIRED)
 find_package(argparse CONFIG REQUIRED)
 find_llama()
+
+set(TOKENIZERS_CPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tokenizers-cpp")
+add_subdirectory(${TOKENIZERS_CPP_DIR} tokenizers EXCLUDE_FROM_ALL)
+set_target_properties(tokenizers_cpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${TOKENIZERS_CPP_DIR}/include")
 
 add_subdirectory(src)

@@ -4,3 +4,6 @@
 [submodule "third_party/onnxruntime"]
 	path = third_party/onnxruntime
 	url = https://github.com/microsoft/onnxruntime
+[submodule "third_party/tokenizers-cpp"]
+	path = third_party/tokenizers-cpp
+	url = https://github.com/mlc-ai/tokenizers-cpp.git
