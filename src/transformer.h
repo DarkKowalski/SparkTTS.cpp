@@ -29,6 +29,8 @@ namespace spark_tts
                 ctx_params.flash_attn = true; // Enable flash attention
 
                 model_params.n_gpu_layers = 25; // Offload all layers to GPU
+                model_params.split_mode = LLAMA_SPLIT_MODE_NONE;
+                model_params.use_mlock = true; // Lock model in memory
 
                 sampler_params.top_k = 50;    // Set top_k for sampling
                 sampler_params.top_p = 0.95f; // Set top_p for sampling
