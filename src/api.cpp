@@ -1,8 +1,5 @@
 #include "api.h"
 
-#include <openvino/openvino.hpp>
-#include <llama-cpp.h>
-
 #include <iostream>
 #include <memory>
 #include <cstring>

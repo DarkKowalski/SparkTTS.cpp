@@ -4,13 +4,7 @@
 
 ### Install Rust
 
-[Install Rust](https://www.rust-lang.org/tools/install)
-
-### Setup OpenVINO GenAI
-
-[Window](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=WINDOWS&DISTRIBUTION=ARCHIVE)
-
-[macOS](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=MACOS&DISTRIBUTION=ARCHIVE)
+[Rust](https://www.rust-lang.org/tools/install)
 
 ### Setup vcpkg
 
@@ -44,6 +38,10 @@ cmake --install build --config Release
 popd
 ```
 
+### Setup OpenVINO (Windows Only)
+
+[Windows](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=WINDOWS&DISTRIBUTION=ARCHIVE)
+
 ### Build ONNX Runtime (macOS only)
 
 ```bash
@@ -57,7 +55,8 @@ python ./tools/ci_build/build.py \
     --build_dir ./build \
     --cmake_extra_defines "CMAKE_POLICY_VERSION_MINIMUM=3.5" \
     --skip_tests \
-    --enable_lto
+    --enable_lto \
+    --use_coreml
 cmake --install build/Release --config Release --prefix ../../lib/onnxruntime
 popd
 ```

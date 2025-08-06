@@ -2,6 +2,8 @@
 
 #include "profiler/profiler.h"
 
+#include <iostream>
+
 namespace spark_tts
 {
     Transformer::Transformer(const std::string &model_path,
@@ -113,7 +115,8 @@ namespace spark_tts
                 break;
             }
 
-            callback_buffer += tokenizer_->token_to_piece(new_token);
+            auto token = tokenizer_->token_to_piece(new_token);
+            callback_buffer += token;
             n_callback++;
             n_total++;
 

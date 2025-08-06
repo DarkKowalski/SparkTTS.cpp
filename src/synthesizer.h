@@ -1,7 +1,10 @@
 #pragma once
 
 #include <llama-cpp.h>
+
+#if defined(_WIN32) || defined(_WIN64)
 #include <openvino/openvino.hpp>
+#endif
 
 #include <memory>
 #include <functional>
@@ -61,8 +64,11 @@ namespace spark_tts
         std::vector<float> synthesize(std::array<int32_t, 32> &voice_features);
 
     private:
-        ov::Core core_;
+#if defined(_WIN32) || defined(_WIN64)
+        ov::Core core_ = ov::Core(); // OpenVINO core for Windows
+#endif
 
+    private:
         std::unique_ptr<IAudioTokenizer> audio_tokenizer_;
         std::unique_ptr<IAudioDetokenizer> audio_detokenizer_;
         std::unique_ptr<Transformer> transformer_;

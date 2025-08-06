@@ -39,16 +39,30 @@ int main(void)
     float *audio_data = util_load_reference_audio("prompt_audio.wav", &audio_size);
     const char *text = "根据统计数据，法国奥德省人口第四多的是哪个市镇？";
 
+#if defined(_WIN32) || defined(_WIN64)
+    const char *wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml";
+    const char *mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml";
+    const char *bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml";
+    const char *audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml";
+#elif defined(__APPLE__)
+    const char *wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.onnx";
+    const char *mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.onnx";
+    const char *bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.onnx";
+    const char *audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.onnx";
+#endif
+    const char *transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_q4_k.gguf";
+    const char *tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/tokenizer.json";
+
     tts_init_voice_feature_extraction(ctx,
-                                      "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml",
-                                      "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml",
-                                      "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml",
+                                      wav2vec_model_path,
+                                      mel_spectrogram_model_path,
+                                      bicodec_tokenizer_model_path,
                                       "CPU");
 
     tts_init_text_to_speech(ctx,
-                            "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml",
-                            "./models/Spark-TTS-0.5B/Transformer/model_f16.gguf",
-                            "./models/Spark-TTS-0.5B/Tokenizer/",
+                            audio_detokenizer_model_path,
+                            transformer_model_path,
+                            tokenizer_path,
                             2048, // transformer_n_ctx
                             3,    // overlapped_semantic_tokens
                             10,   // callback_semantic_tokens, 0 for immediate callback

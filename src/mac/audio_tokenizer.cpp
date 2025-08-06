@@ -11,6 +11,10 @@ namespace spark_tts
           memory_info_(Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault))
     {
         Ort::SessionOptions session_options;
+        std::unordered_map<std::string, std::string> provider_options;
+        provider_options["ModelFormat"] = "NeuralNetwork"; // MLProgram crashed on macOS 15.5/Apple Silicon M2
+        session_options.AppendExecutionProvider("CoreML", provider_options);
+
         // Load the ONNX models
         wav2vec_session_ = std::make_unique<Ort::Session>(env_, wav2vec_model_path.c_str(), session_options);
         mel_spectrogram_session_ = std::make_unique<Ort::Session>(env_, mel_spectrogram_model_path.c_str(), session_options);

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <openvino/openvino.hpp>
-
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -24,7 +22,6 @@ namespace spark_tts
         kVeryHigh = 4,
     };
 
-    std::string stringify_global_tokens(const ov::Tensor &global_tokens);
     std::string stringify_global_tokens(const std::array<int32_t, 32> &global_tokens);
 
     std::string assemble_prompt(const std::string &global_token_input, const std::string &text);

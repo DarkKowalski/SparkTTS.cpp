@@ -13,7 +13,7 @@
 namespace spark_tts
 {
 
-    Synthesizer::Synthesizer() : core_(ov::Core())
+    Synthesizer::Synthesizer()
     {
         Profiler::instance().start(1024 * 32); // Start profiler with 32 MB buffer size
 

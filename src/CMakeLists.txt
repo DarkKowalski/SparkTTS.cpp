@@ -21,8 +21,8 @@ if(WIN32)
     )
 
     target_compile_definitions(tts_api PRIVATE
-        SPARK_TTS_SHARED
-        SPARK_TTS_BUILD
+        TTS_SHARED=1
+        TTS_BUILD=1
     )
 
     set_target_properties(tts_api PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_LIST_DIR}/api.h")
@@ -118,25 +118,31 @@ elseif(APPLE)
         token_buffer.cpp
         profiler/perfetto_categories.cpp
         profiler/profiler.cpp
+        api.cpp
     )
 
     target_link_libraries(tts_api PRIVATE
-        openvino::runtime
         llama
         onnxruntime
+        tokenizers_cpp
+    )
+
+    target_compile_options(tts_api PRIVATE
+        -fvisibility=hidden
     )
 
     target_compile_definitions(tts_api PRIVATE
-        SPARK_TTS_SHARED
-        SPARK_TTS_BUILD
+        TTS_SHARED=1
+        TTS_BUILD=1
     )
 
     # when using CoreML
-    # target_link_libraries(tts_api PRIVATE
-    # "-framework CoreML"
-    # "-framework Accelerate"
-    # "-framework Metal"
-    # )
+    target_link_libraries(tts_api PRIVATE
+        "-framework CoreML"
+        "-framework Accelerate"
+        "-framework Metal"
+    )
+
     set_target_properties(tts_api PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_LIST_DIR}/api.h")
     set_target_properties(tts_api PROPERTIES
         BUILD_WITH_INSTALL_RPATH TRUE
@@ -207,10 +213,17 @@ elseif(APPLE)
     )
 
     target_link_libraries(tts_cli PRIVATE
-        openvino::runtime
         llama
+        onnxruntime
         SndFile::sndfile
         argparse::argparse
+        tokenizers_cpp
+    )
+
+    target_link_libraries(tts_cli PRIVATE
+        "-framework CoreML"
+        "-framework Accelerate"
+        "-framework Metal"
     )
 
     if(ENABLE_PERFETTO)
@@ -224,6 +237,5 @@ elseif(APPLE)
 
     # C++ CLI End
     install_llama("${CMAKE_INSTALL_PREFIX}/bin")
-    install_openvino("${CMAKE_INSTALL_PREFIX}/bin")
     install_onnxruntime("${CMAKE_INSTALL_PREFIX}/bin")
 endif()

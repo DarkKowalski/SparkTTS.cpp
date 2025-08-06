@@ -1,6 +1,3 @@
-#include <openvino/openvino.hpp>
-#include <llama-cpp.h>
-
 #include <sndfile.hh>
 
 #include <argparse/argparse.hpp>
@@ -35,7 +32,7 @@ int main(int argc, char *argv[])
     const std::string bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.onnx";
     const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.onnx";
 #endif
-    const std::string transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_f16.gguf";
+    const std::string transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_q4_k.gguf";
     const std::string tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/tokenizer.json";
 
     synthesizer.init_voice_feature_extraction(
