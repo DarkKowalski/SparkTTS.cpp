@@ -18,6 +18,7 @@ if(WIN32)
         openvino::runtime
         llama
         tokenizers_cpp
+        onnxruntime
     )
 
     target_compile_definitions(tts_api PRIVATE
@@ -85,6 +86,7 @@ if(WIN32)
         SndFile::sndfile
         argparse::argparse
         tokenizers_cpp
+        onnxruntime
     )
 
     if(ENABLE_PERFETTO)
@@ -104,6 +106,7 @@ if(WIN32)
     # C++ CLI End
     install_llama("${CMAKE_INSTALL_PREFIX}/bin")
     install_openvino("${CMAKE_INSTALL_PREFIX}/bin")
+    install_onnxruntime("${CMAKE_INSTALL_PREFIX}/bin")
 
 elseif(APPLE)
     # C-API Begin

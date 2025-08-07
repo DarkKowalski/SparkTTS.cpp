@@ -1,47 +1,46 @@
 #include "audio_detokenizer.h"
 
-#include "../profiler/profiler.h"
+#include <onnxruntime/dml_provider_factory.h>
+#include <onnxruntime/onnxruntime_c_api.h>
 
 namespace spark_tts
 {
-    AudioDetokenizer::AudioDetokenizer(ov::Core &core, const std::string &model_path, const std::string &device_name)
+    AudioDetokenizer::AudioDetokenizer(const std::string &model_path) : env_(ORT_LOGGING_LEVEL_ERROR, "AudioDetokenizer"),
+                                                                        memory_info_(Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault))
     {
-        TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::AudioDetokenizer");
-
-        auto bicodec_detokenizer_model = core.read_model(model_path);
-        bicodec_detokenizer_ = core.compile_model(model_path, device_name);
+        Ort::SessionOptions session_options;
+        session_options.DisableMemPattern();
+        session_options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
+        Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_CUDA(session_options, 0));
+        bicodec_detokenizer_session_ = std::make_unique<Ort::Session>(env_, std::wstring(model_path.begin(), model_path.end()).c_str(), session_options);
     }
 
-    // Semantic tokens [1, 50] i64
-    // Global tokens [1, 1, 32] i32
     std::array<float, 16000 * 1> AudioDetokenizer::detokenize(std::array<int64_t, 50> &semantic_tokens,
                                                               std::array<int32_t, 32> &global_tokens)
     {
-        TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::detokenize");
+        std::array<float, 16000 * 1> wav_recon_data = {};
 
-        ov::Tensor semantic_tokens_tensor(ov::element::i64, {1, 50});
-        ov::Tensor global_tokens_tensor(ov::element::i32, {1, 1, 32});
-        std::copy(semantic_tokens.begin(), semantic_tokens.end(), semantic_tokens_tensor.data<int64_t>());
-        std::copy(global_tokens.begin(), global_tokens.end(), global_tokens_tensor.data<int32_t>());
+        std::array<Ort::Value, 2> input_tensors = {
+            Ort::Value::CreateTensor<int64_t>(
+                memory_info_,
+                semantic_tokens.data(), semantic_tokens.size(),
+                bicodec_input_semantic_tokens_shape_.data(), bicodec_input_semantic_tokens_shape_.size()),
+            Ort::Value::CreateTensor<int32_t>(
+                memory_info_,
+                global_tokens.data(), global_tokens.size(),
+                bicodec_input_global_tokens_shape_.data(), bicodec_input_global_tokens_shape_.size())};
 
-        ov::InferRequest infer_request = bicodec_detokenizer_.create_infer_request();
-        infer_request.set_input_tensor(0, semantic_tokens_tensor);
-        infer_request.set_input_tensor(1, global_tokens_tensor);
-        infer_request.infer();
+        Ort::Value output_tensor = Ort::Value::CreateTensor<float>(
+            memory_info_,
+            wav_recon_data.data(), wav_recon_data.size(),
+            bicodec_output_wav_recon_shape_.data(), bicodec_output_wav_recon_shape_.size());
 
-        auto output_tensor = infer_request.get_output_tensor();
-        std::array<float, 16000 * 1> audio_output;
-        // output [1, 1, 16000] f32
-        if (output_tensor.get_shape() == ov::Shape{1, 1, 16000})
-        {
-            std::copy(output_tensor.data<float>(), output_tensor.data<float>() + 16000, audio_output.begin());
-        }
-        else
-        {
-            throw std::runtime_error("Unexpected output shape: " + std::to_string(output_tensor.get_shape().size()));
-        }
+        bicodec_detokenizer_session_->Run(
+            Ort::RunOptions{nullptr},
+            bicodec_input_names_.data(), input_tensors.data(), input_tensors.size(),
+            bicodec_output_names_.data(), &output_tensor, 1);
 
-        return audio_output;
+        return wav_recon_data;
     }
 
 } // namespace spark_tts

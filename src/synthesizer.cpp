@@ -65,7 +65,7 @@ namespace spark_tts
         callback_semantic_tokens_ = callback_semantic_tokens;
 
 #if defined(_WIN32) || defined(_WIN64)
-        audio_detokenizer_ = std::make_unique<AudioDetokenizer>(core_, audio_detokenizer_model_path, device_name);
+        audio_detokenizer_ = std::make_unique<AudioDetokenizer>(audio_detokenizer_model_path);
 #elif defined(__APPLE__)
         audio_detokenizer_ = std::make_unique<AudioDetokenizer>(audio_detokenizer_model_path);
 #endif

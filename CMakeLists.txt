@@ -30,6 +30,8 @@ if(APPLE)
 elseif(WIN32)
     include(OpenVINO)
     find_package(OpenVINO REQUIRED COMPONENTS Runtime)
+    include(ONNXRuntime)
+    find_onnxruntime()
 endif()
 
 option(ENABLE_PERFETTO "Enable Perfetto tracing" OFF)

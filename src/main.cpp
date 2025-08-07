@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml";
     const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml";
     const std::string bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml";
-    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.xml";
+    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.onnx";
 #elif defined(__APPLE__)
     const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.onnx";
     const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.onnx";
