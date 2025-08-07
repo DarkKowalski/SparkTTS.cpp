@@ -11,7 +11,7 @@ namespace spark_tts
         Ort::SessionOptions session_options;
         session_options.DisableMemPattern();
         session_options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
-        Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_CUDA(session_options, 0));
+        Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_DML(session_options, 0));
         bicodec_detokenizer_session_ = std::make_unique<Ort::Session>(env_, std::wstring(model_path.begin(), model_path.end()).c_str(), session_options);
     }
 
