@@ -31,5 +31,11 @@ namespace spark_tts
         const std::array<int64_t, 2> bicodec_input_semantic_tokens_shape_ = {1, 50};
         const std::array<int64_t, 3> bicodec_input_global_tokens_shape_ = {1, 1, 32};
         const std::array<int64_t, 3> bicodec_output_wav_recon_shape_ = {1, 1, 16000};
+
+        std::array<int64_t, 50> semantic_tokens_data_;
+        std::array<int32_t, 32> global_tokens_data_;
+        std::array<float, 16000 * 1> wav_recon_data_;
+        std::array<Ort::Value, 2> input_tensors_;
+        Ort::Value output_tensor_;
     };
 } // namespace spark_tts
