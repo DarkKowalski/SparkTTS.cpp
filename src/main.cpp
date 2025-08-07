@@ -9,6 +9,7 @@
 #include <memory>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <functional>
 
 #include "utils.h"
@@ -16,7 +17,7 @@
 
 int main(int argc, char *argv[])
 {
-    auto ref_audio = spark_tts::load_reference_audio("prompt_audio.wav");
+    //auto ref_audio = spark_tts::load_reference_audio("prompt_audio.wav");
 
     spark_tts::Synthesizer synthesizer;
 
@@ -35,11 +36,11 @@ int main(int argc, char *argv[])
     const std::string transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_q4_k.gguf";
     const std::string tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/tokenizer.json";
 
-    synthesizer.init_voice_feature_extraction(
-        wav2vec_model_path,
-        mel_spectrogram_model_path,
-        bicodec_tokenizer_model_path,
-        "CPU");
+    // synthesizer.init_voice_feature_extraction(
+    //     wav2vec_model_path,
+    //     mel_spectrogram_model_path,
+    //     bicodec_tokenizer_model_path,
+    //     "CPU");
 
     synthesizer.init_text_to_speech(
         audio_detokenizer_model_path,
@@ -52,7 +53,13 @@ int main(int argc, char *argv[])
 
     const std::string text = "根据统计数据，法国奥德省人口第四多的是哪个市镇？";
 
-    auto voice_features = synthesizer.extract_voice_features(ref_audio);
+    std::array<int32_t, 32> voice_features = {3363, 2367, 2615, 3369, 278, 3556, 1194,
+                                              1558, 3141, 3778, 2442, 3109, 1017, 3844,
+                                              3194, 3158, 2751, 1586, 1096, 3133, 3711,
+                                              3178, 2767, 133, 2354, 1838, 3644, 2401,
+                                              3450, 2400, 50, 2751};
+
+    // auto voice_features = synthesizer.extract_voice_features(ref_audio);
 
     for (int i = 0; i < 10; i++)
     {

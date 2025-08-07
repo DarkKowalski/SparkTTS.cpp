@@ -4,21 +4,20 @@
 
 namespace spark_tts
 {
-    AudioTokenizer::AudioTokenizer(ov::Core &core,
-                                   const std::string &wav2vec_model_path,
-                                   const std::string &mel_spectrogram_model_path,
-                                   const std::string &bicodec_tokenizer_model_path,
-                                   const std::string &device_name)
+    AudioTokenizer::AudioTokenizer(
+        const std::string &wav2vec_model_path,
+        const std::string &mel_spectrogram_model_path,
+        const std::string &bicodec_tokenizer_model_path) : core_(ov::Core())
     {
         TRACE_EVENT("audio_tokenizer", "AudioTokenizer::AudioTokenizer");
 
-        auto wav2vec_model = core.read_model(wav2vec_model_path);
-        auto mel_spectrogram_model = core.read_model(mel_spectrogram_model_path);
-        auto bicodec_tokenizer_model = core.read_model(bicodec_tokenizer_model_path);
+        auto wav2vec_model = core_.read_model(wav2vec_model_path);
+        auto mel_spectrogram_model = core_.read_model(mel_spectrogram_model_path);
+        auto bicodec_tokenizer_model = core_.read_model(bicodec_tokenizer_model_path);
 
-        wav2vec_ = core.compile_model(wav2vec_model, device_name);
-        mel_spectrogram_ = core.compile_model(mel_spectrogram_model, device_name);
-        bicodec_tokenizer_ = core.compile_model(bicodec_tokenizer_model, device_name);
+        wav2vec_ = core_.compile_model(wav2vec_model, device_name_);
+        mel_spectrogram_ = core_.compile_model(mel_spectrogram_model, device_name_);
+        bicodec_tokenizer_ = core_.compile_model(bicodec_tokenizer_model, device_name_);
     }
 
     std::array<float, 16000 * 6> AudioTokenizer::pad_or_trim_audio(const std::vector<float> &mono_audio) const

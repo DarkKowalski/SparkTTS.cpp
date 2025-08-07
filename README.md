@@ -42,7 +42,33 @@ popd
 
 [Windows](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=WINDOWS&DISTRIBUTION=ARCHIVE)
 
-### Build ONNX Runtime (macOS only)
+### Build ONNX Runtime
+
+#### Windows
+
+```batch
+cd third_party\onnxruntime
+python ./tools/ci_build/build.py ^
+    --update ^
+    --build ^
+    --config Release ^
+    --build_shared_lib ^
+    --parallel ^
+    --build_dir ./build ^
+    --cmake_extra_defines "CMAKE_POLICY_VERSION_MINIMUM=3.5" ^
+    --skip_tests ^
+    --enable_lto ^
+    --use_dml
+cmake --install build/Release --config Release --prefix ..\..\lib\onnxruntime
+cd ..\..
+```
+**IMPORTANT**
+
+Download [microsoft.ai.directml.1.15.0.nupkg](https://www.nuget.org/packages/Microsoft.AI.DirectML)
+
+Unzip it and copy `bin\x64-win\DirectML.dll` to your install directory (e.g., `lib\onnxruntime\bin`).
+
+#### macOS
 
 ```bash
 pushd third_party/onnxruntime

@@ -41,7 +41,7 @@ namespace spark_tts
         TRACE_EVENT("synthesizer", "init_voice_feature_extraction");
 
 #if defined(_WIN32) || defined(_WIN64)
-        audio_tokenizer_ = std::make_unique<AudioTokenizer>(core_, wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path, device_name);
+        audio_tokenizer_ = std::make_unique<AudioTokenizer>(wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path);
 #elif defined(__APPLE__)
         audio_tokenizer_ = std::make_unique<AudioTokenizer>(wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path);
 #endif

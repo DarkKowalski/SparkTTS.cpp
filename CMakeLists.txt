@@ -8,6 +8,9 @@ project(spark_tts
     LANGUAGES C CXX
 )
 
+option(ENABLE_PERFETTO "Enable Perfetto tracing" OFF)
+option(ENABLE_FEATURE_EXTRACTOR "Enable feature extractor" ON)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_C_STANDARD 11)
@@ -33,8 +36,6 @@ elseif(WIN32)
     include(ONNXRuntime)
     find_onnxruntime()
 endif()
-
-option(ENABLE_PERFETTO "Enable Perfetto tracing" OFF)
 
 if(ENABLE_PERFETTO)
     message(STATUS "Perfetto tracing is enabled.")

@@ -1,3 +1,6 @@
+
+#include "../profiler/profiler.h"
+
 #include "audio_detokenizer.h"
 
 #include <onnxruntime/dml_provider_factory.h>
@@ -9,6 +12,8 @@ namespace spark_tts
     AudioDetokenizer::AudioDetokenizer(const std::string &model_path) : env_(ORT_LOGGING_LEVEL_ERROR, "AudioDetokenizer"),
                                                                         memory_info_(Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault))
     {
+        TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::AudioDetokenizer");
+
         try
         {
             Ort::SessionOptions session_options;
@@ -47,6 +52,8 @@ namespace spark_tts
     std::array<float, 16000 * 1> AudioDetokenizer::detokenize(std::array<int64_t, 50> &semantic_tokens,
                                                               std::array<int32_t, 32> &global_tokens)
     {
+        TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::detokenize");
+
         std::copy(semantic_tokens.begin(), semantic_tokens.end(), semantic_tokens_data_.begin());
         std::copy(global_tokens.begin(), global_tokens.end(), global_tokens_data_.begin());
         std::fill(wav_recon_data_.begin(), wav_recon_data_.end(), 0.0f);
