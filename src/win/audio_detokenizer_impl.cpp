@@ -1,7 +1,7 @@
 
 #include "../profiler/profiler.h"
 
-#include "audio_detokenizer.h"
+#include "audio_detokenizer_impl.h"
 
 #include <onnxruntime/dml_provider_factory.h>
 #include <onnxruntime/onnxruntime_c_api.h>
@@ -9,7 +9,7 @@
 
 namespace spark_tts
 {
-    AudioDetokenizer::AudioDetokenizer(const std::string &model_path) : env_(ORT_LOGGING_LEVEL_ERROR, "AudioDetokenizer"),
+    AudioDetokenizerImpl::AudioDetokenizerImpl(const std::string &model_path) : env_(ORT_LOGGING_LEVEL_ERROR, "AudioDetokenizer"),
                                                                         memory_info_(Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault))
     {
         TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::AudioDetokenizer");
@@ -49,7 +49,7 @@ namespace spark_tts
             bicodec_output_wav_recon_shape_.data(), bicodec_output_wav_recon_shape_.size());
     }
 
-    std::array<float, 16000 * 1> AudioDetokenizer::detokenize(std::array<int64_t, 50> &semantic_tokens,
+    std::array<float, 16000 * 1> AudioDetokenizerImpl::detokenize(std::array<int64_t, 50> &semantic_tokens,
                                                               std::array<int32_t, 32> &global_tokens)
     {
         TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::detokenize");

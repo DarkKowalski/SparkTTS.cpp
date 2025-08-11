@@ -29,8 +29,6 @@ endif()
 
 # Third-party dependencies
 if(WIN32)
-    include(OpenVINO)
-    find_package(OpenVINO REQUIRED COMPONENTS Runtime)
     include(ONNXRuntime)
     find_onnxruntime()
 endif()

@@ -1,8 +1,8 @@
 #include "synthesizer.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-#include "win/audio_detokenizer.h"
-#include "win/audio_tokenizer.h"
+#include "win/audio_detokenizer_impl.h"
+#include "win/audio_tokenizer_impl.h"
 #elif defined(__APPLE__)
 #include "mac/audio_detokenizer_impl.h"
 #include "mac/audio_tokenizer_impl.h"
@@ -33,18 +33,12 @@ namespace spark_tts
         Profiler::instance().stop("spark_tts.pftrace"); // Stop profiler and write trace to file
     }
 
-    void Synthesizer::init_voice_feature_extraction(const std::string &wav2vec_model_path,
-                                                    const std::string &mel_spectrogram_model_path,
-                                                    const std::string &bicodec_tokenizer_model_path,
-                                                    const std::string &device_name)
+    void Synthesizer::init_voice_feature_extraction(const std::string &audio_tokenizer_model_path)
+
     {
         TRACE_EVENT("synthesizer", "init_voice_feature_extraction");
 
-#if defined(_WIN32) || defined(_WIN64)
-        audio_tokenizer_ = std::make_unique<AudioTokenizer>(wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path);
-#elif defined(__APPLE__)
-        audio_tokenizer_ = std::make_unique<AudioTokenizerImpl>(bicodec_tokenizer_model_path);
-#endif
+        audio_tokenizer_ = std::make_unique<AudioTokenizerImpl>(audio_tokenizer_model_path);
     }
 
     void Synthesizer::init_text_to_speech(const std::string &audio_detokenizer_model_path,
@@ -64,11 +58,7 @@ namespace spark_tts
         overlapped_semantic_tokens_ = overlapped_semantic_tokens;
         callback_semantic_tokens_ = callback_semantic_tokens;
 
-#if defined(_WIN32) || defined(_WIN64)
-        audio_detokenizer_ = std::make_unique<AudioDetokenizer>(audio_detokenizer_model_path);
-#elif defined(__APPLE__)
         audio_detokenizer_ = std::make_unique<AudioDetokenizerImpl>(audio_detokenizer_model_path);
-#endif
 
         auto transformer_params = Transformer::Params();
         transformer_params.ctx_params.n_ctx = transformer_n_ctx;

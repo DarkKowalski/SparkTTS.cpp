@@ -1,4 +1,11 @@
-# SparkTTS with OpenVINO/llama.cpp
+# SparkTTS inference with C++
+Windows:
+ - ONNX Runtime (DirectML backend) for BiCodec/Wav2Vec etc.
+ - llama.cpp (Vulkan backend) for Qwen2.5-0.5B
+
+macOS:
+ - CoreML for BiCodec/Wav2Vec etc.
+ - llama.cpp (Metal backend) for Qwen2.5-0.5B
 
 ## How to build
 
@@ -38,13 +45,7 @@ cmake --install build --config Release
 popd
 ```
 
-### Setup OpenVINO (Windows Only)
-
-[Windows](https://docs.openvino.ai/2025/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2025_2_0&OP_SYSTEM=WINDOWS&DISTRIBUTION=ARCHIVE)
-
-### Build ONNX Runtime
-
-#### Windows
+### Build ONNX Runtime (Windows only with DirectML)
 
 ```batch
 cd third_party\onnxruntime
@@ -62,6 +63,7 @@ python ./tools/ci_build/build.py ^
 cmake --install build/Release --config Release --prefix ..\..\lib\onnxruntime
 cd ..\..
 ```
+
 **IMPORTANT**
 
 Download [microsoft.ai.directml.1.15.0.nupkg](https://www.nuget.org/packages/Microsoft.AI.DirectML)

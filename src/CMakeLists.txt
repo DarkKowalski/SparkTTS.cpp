@@ -1,8 +1,8 @@
 if(WIN32)
     # C-API Begin
     add_library(tts_api SHARED
-        win/audio_tokenizer.cpp
-        win/audio_detokenizer.cpp
+        win/audio_tokenizer_impl.cpp
+        win/audio_detokenizer_impl.cpp
         prompt.cpp
         sampler.cpp
         tokenizer.cpp
@@ -15,7 +15,6 @@ if(WIN32)
     )
 
     target_link_libraries(tts_api PRIVATE
-        openvino::runtime
         llama
         tokenizers_cpp
         onnxruntime
@@ -66,8 +65,8 @@ if(WIN32)
 
     # C++ CLI Begin
     add_executable(tts_cli
-        win/audio_tokenizer.cpp
-        win/audio_detokenizer.cpp
+        win/audio_tokenizer_impl.cpp
+        win/audio_detokenizer_impl.cpp
         profiler/perfetto_categories.cpp
         profiler/profiler.cpp
         prompt.cpp
@@ -81,7 +80,6 @@ if(WIN32)
     )
 
     target_link_libraries(tts_cli PRIVATE
-        openvino::runtime
         llama
         SndFile::sndfile
         argparse::argparse
@@ -105,7 +103,6 @@ if(WIN32)
 
     # C++ CLI End
     install_llama("${CMAKE_INSTALL_PREFIX}/bin")
-    install_openvino("${CMAKE_INSTALL_PREFIX}/bin")
     install_onnxruntime("${CMAKE_INSTALL_PREFIX}/bin")
 
 elseif(APPLE)

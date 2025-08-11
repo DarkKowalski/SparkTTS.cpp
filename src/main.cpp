@@ -23,24 +23,16 @@ int main(int argc, char *argv[])
 
     // FIXME: Development purpose only, to be removed later
 #if defined(_WIN32) || defined(_WIN64)
-    const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.xml";
-    const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.xml";
-    const std::string bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.xml";
-    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.onnx";
+    const std::string audio_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/AudioTokenizer.onnx";
+    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/AudioDetokenizer.onnx";
 #elif defined(__APPLE__)
-    const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.onnx";
-    const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.onnx";
-    const std::string bicodec_tokenizer_model_path = "./coreml_models/Spark-TTS-0.5B/AudioTokenizer/AudioTokenizer.mlmodelc";
-    const std::string audio_detokenizer_model_path = "./coreml_models/Spark-TTS-0.5B/AudioDetokenizer/AudioDetokenizer.mlmodelc";
+    const std::string audio_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/AudioTokenizer.mlmodelc";
+    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/AudioDetokenizer.mlmodelc";
 #endif
     const std::string transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_q4_k.gguf";
     const std::string tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/tokenizer.json";
 
-    synthesizer.init_voice_feature_extraction(
-        wav2vec_model_path,
-        mel_spectrogram_model_path,
-        bicodec_tokenizer_model_path,
-        "CPU");
+    synthesizer.init_voice_feature_extraction(audio_tokenizer_model_path);
 
     synthesizer.init_text_to_speech(
         audio_detokenizer_model_path,
@@ -60,6 +52,13 @@ int main(int argc, char *argv[])
     //                                           3450, 2400, 50, 2751};
 
     auto voice_features = synthesizer.extract_voice_features(ref_audio);
+
+    std::cout << "Extracted voice features: ";
+    for (const auto &feature : voice_features)
+    {
+        std::cout << feature << " ";
+    }
+    std::cout << std::endl;
 
     for (int i = 0; i < 10; i++)
     {

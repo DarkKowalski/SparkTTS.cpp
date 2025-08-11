@@ -24,21 +24,17 @@ extern "C"
         delete ctx;
     }
 
-    bool tts_init_voice_feature_extraction(tts_context *ctx,
-                                           const char *wav2vec_model_path,
-                                           const char *mel_spectrogram_model_path,
-                                           const char *bicodec_tokenizer_model_path,
-                                           const char *device_name)
+    bool tts_init_voice_feature_extraction(tts_context *ctx, const char *audio_tokenizer_model_path)
     {
-        if (!ctx || !wav2vec_model_path || !mel_spectrogram_model_path || !bicodec_tokenizer_model_path || !device_name)
+        if (!ctx || !audio_tokenizer_model_path)
         {
+            std::cerr << "Invalid parameters for voice feature extraction initialization." << std::endl;
             return false;
         }
 
         try
         {
-            ctx->synthesizer.init_voice_feature_extraction(
-                wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path, device_name);
+            ctx->synthesizer.init_voice_feature_extraction(audio_tokenizer_model_path);
         }
         catch (const std::exception &e)
         {

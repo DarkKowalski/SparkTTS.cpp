@@ -36,10 +36,7 @@ extern "C"
     TTS_API void tts_free_context(struct tts_context *ctx);
 
     TTS_API bool tts_init_voice_feature_extraction(tts_context *ctx,
-                                                   const char *wav2vec_model_path,
-                                                   const char *mel_spectrogram_model_path,
-                                                   const char *bicodec_tokenizer_model_path,
-                                                   const char *device_name);
+                                                   const char *audio_tokenizer_model_path);
 
     TTS_API bool tts_init_text_to_speech(tts_context *ctx,
                                          const char *audio_detokenizer_model_path,

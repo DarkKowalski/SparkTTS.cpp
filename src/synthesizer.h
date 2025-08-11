@@ -2,10 +2,6 @@
 
 #include <llama-cpp.h>
 
-#if defined(_WIN32) || defined(_WIN64)
-#include <openvino/openvino.hpp>
-#endif
-
 #include <memory>
 #include <functional>
 #include <vector>
@@ -33,10 +29,7 @@ namespace spark_tts
 
         // Lazy initialization
     public:
-        void init_voice_feature_extraction(const std::string &wav2vec_model_path,
-                                           const std::string &mel_spectrogram_model_path,
-                                           const std::string &bicodec_tokenizer_model_path,
-                                           const std::string &device_name);
+        void init_voice_feature_extraction(const std::string &audio_tokenizer_model_path);
 
         void init_text_to_speech(const std::string &audio_detokenizer_model_path,
                                  const std::string &transformer_model_path,
@@ -62,11 +55,6 @@ namespace spark_tts
                                                           TextToSpeechCallback &callback);
 
         std::vector<float> synthesize(std::array<int32_t, 32> &voice_features);
-
-    private:
-#if defined(_WIN32) || defined(_WIN64)
-        ov::Core core_ = ov::Core(); // OpenVINO core for Windows
-#endif
 
     private:
         std::unique_ptr<IAudioTokenizer> audio_tokenizer_;
