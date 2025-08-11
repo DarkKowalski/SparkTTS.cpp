@@ -110,6 +110,11 @@
         "execution": "cpp",
         "string_view": "cpp",
         "shared_mutex": "cpp",
-        "stacktrace": "cpp"
+        "stacktrace": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "*.inc": "cpp",
+        "span_ext": "cpp",
+        "string_span": "cpp"
     }
 }

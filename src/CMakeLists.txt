@@ -112,7 +112,8 @@ elseif(APPLE)
     # C-API Begin
     add_library(tts_api SHARED
         mac/audio_tokenizer.cpp
-        mac/audio_detokenizer.cpp
+        mac/audio_detokenizer.mm
+        mac/audio_detokenizer_coreml.m
         prompt.cpp
         sampler.cpp
         tokenizer.cpp
@@ -144,6 +145,10 @@ elseif(APPLE)
         "-framework CoreML"
         "-framework Accelerate"
         "-framework Metal"
+        "-framework Foundation"
+    )
+    target_compile_options(tts_api PRIVATE
+        -fobjc-arc
     )
 
     set_target_properties(tts_api PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_LIST_DIR}/api.h")
@@ -195,7 +200,8 @@ elseif(APPLE)
     # C++ CLI Begin
     add_executable(tts_cli
         mac/audio_tokenizer.cpp
-        mac/audio_detokenizer.cpp
+        mac/audio_detokenizer_coreml.m
+        mac/audio_detokenizer.mm
         profiler/perfetto_categories.cpp
         profiler/profiler.cpp
         prompt.cpp
@@ -227,6 +233,11 @@ elseif(APPLE)
         "-framework CoreML"
         "-framework Accelerate"
         "-framework Metal"
+        "-framework Foundation"
+    )
+
+    target_compile_options(tts_cli PRIVATE
+        -fobjc-arc
     )
 
     if(ENABLE_PERFETTO)

@@ -24,6 +24,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET 15.0)
+    enable_language(OBJC OBJCXX)
 endif()
 
 # Third-party dependencies

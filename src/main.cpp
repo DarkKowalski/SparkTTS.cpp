@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     const std::string wav2vec_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/wav2vec.onnx";
     const std::string mel_spectrogram_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/mel_spectrogram.onnx";
     const std::string bicodec_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/bicodec_tokenizer.onnx";
-    const std::string audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/bicodec_detokenizer.onnx";
+    const std::string audio_detokenizer_model_path = "./coreml_models/Spark-TTS-0.5B/AudioDetokenizer/BiCodecDetokenizer.mlmodelc";
 #endif
     const std::string transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_q4_k.gguf";
     const std::string tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/tokenizer.json";
