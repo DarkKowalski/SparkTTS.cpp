@@ -4,8 +4,8 @@
 #include "win/audio_detokenizer.h"
 #include "win/audio_tokenizer.h"
 #elif defined(__APPLE__)
-#include "mac/audio_detokenizer.h"
-#include "mac/audio_tokenizer.h"
+#include "mac/audio_detokenizer_impl.h"
+#include "mac/audio_tokenizer_impl.h"
 #endif
 
 #include "profiler/profiler.h"
@@ -43,7 +43,7 @@ namespace spark_tts
 #if defined(_WIN32) || defined(_WIN64)
         audio_tokenizer_ = std::make_unique<AudioTokenizer>(wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path);
 #elif defined(__APPLE__)
-        audio_tokenizer_ = std::make_unique<AudioTokenizer>(wav2vec_model_path, mel_spectrogram_model_path, bicodec_tokenizer_model_path);
+        audio_tokenizer_ = std::make_unique<AudioTokenizerImpl>(bicodec_tokenizer_model_path);
 #endif
     }
 
@@ -67,7 +67,7 @@ namespace spark_tts
 #if defined(_WIN32) || defined(_WIN64)
         audio_detokenizer_ = std::make_unique<AudioDetokenizer>(audio_detokenizer_model_path);
 #elif defined(__APPLE__)
-        audio_detokenizer_ = std::make_unique<AudioDetokenizer>(audio_detokenizer_model_path);
+        audio_detokenizer_ = std::make_unique<AudioDetokenizerImpl>(audio_detokenizer_model_path);
 #endif
 
         auto transformer_params = Transformer::Params();

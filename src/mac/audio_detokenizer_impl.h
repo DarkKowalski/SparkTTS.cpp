@@ -8,11 +8,11 @@
 
 namespace spark_tts
 {
-    class AudioDetokenizer : public IAudioDetokenizer
+    class AudioDetokenizerImpl : public IAudioDetokenizer
     {
     public:
-        AudioDetokenizer(const std::string &model_path);
-        ~AudioDetokenizer() override;
+        AudioDetokenizerImpl(const std::string &model_path);
+        ~AudioDetokenizerImpl() override;
 
     public:
         // Detokenize semantic tokens to audio

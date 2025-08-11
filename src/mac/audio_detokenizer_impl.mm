@@ -1,4 +1,4 @@
-#include "audio_detokenizer.h"
+#include "audio_detokenizer_impl.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -7,7 +7,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreML/CoreML.h>
 
-#import "audio_detokenizer_coreml.h"
+#import "gen/AudioDetokenizer.h"
 
 
 namespace spark_tts
@@ -16,7 +16,7 @@ namespace spark_tts
         const void *model = nullptr;
     };
 
-    AudioDetokenizer::AudioDetokenizer(const std::string &model_path) {
+    AudioDetokenizerImpl::AudioDetokenizerImpl(const std::string &model_path) {
         NSString * model_path_str = [[NSString alloc] initWithUTF8String:model_path.c_str()];
         NSURL * url = [NSURL fileURLWithPath: model_path_str];
         MLModelConfiguration *config = [[MLModelConfiguration alloc] init];
@@ -27,7 +27,7 @@ namespace spark_tts
         config.computeUnits = MLComputeUnitsCPUAndGPU;
 
         NSError *error = nil;
-        const void * model = CFBridgingRetain([[BiCodecDetokenizer alloc] initWithContentsOfURL:url configuration:config error:&error]);
+        const void * model = CFBridgingRetain([[AudioDetokenizer alloc] initWithContentsOfURL:url configuration:config error:&error]);
         if (model == nullptr) {
             throw std::runtime_error("Failed to load CoreML model"
                                      + std::string([error localizedDescription].UTF8String));
@@ -37,14 +37,14 @@ namespace spark_tts
         static_cast<ObjectiveContext *>(objc_context_)->model = model;
     }
 
-    AudioDetokenizer::~AudioDetokenizer() {
+    AudioDetokenizerImpl::~AudioDetokenizerImpl() {
         if (objc_context_) {
             CFRelease(static_cast<ObjectiveContext *>(objc_context_)->model);
             delete static_cast<ObjectiveContext *>(objc_context_);
         }
     }
 
-    std::array<float, 16000 * 1> AudioDetokenizer::detokenize(std::array<int64_t, 50> &semantic_tokens,
+    std::array<float, 16000 * 1> AudioDetokenizerImpl::detokenize(std::array<int64_t, 50> &semantic_tokens,
                                                               std::array<int32_t, 32> &global_tokens)
     {
         // assume objc_context_ is not null and model is loaded
@@ -75,7 +75,7 @@ namespace spark_tts
 
         @autoreleasepool {
             NSError *error = nil;
-            BiCodecDetokenizerOutput *output = [(__bridge id) context->model predictionFromSemantic_tokens: semantic_tokens_input
+            AudioDetokenizerOutput *output = [(__bridge id) context->model predictionFromSemantic_tokens: semantic_tokens_input
                                                                                              global_tokens: global_tokens_input
                                                                                                    error:&error];
             if (error) {

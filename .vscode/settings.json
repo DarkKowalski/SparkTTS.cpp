@@ -115,6 +115,8 @@
         "hash_set": "cpp",
         "*.inc": "cpp",
         "span_ext": "cpp",
-        "string_span": "cpp"
+        "string_span": "cpp",
+        "scoped_allocator": "cpp",
+        "pointers": "cpp"
     }
 }

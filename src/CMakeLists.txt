@@ -111,9 +111,10 @@ if(WIN32)
 elseif(APPLE)
     # C-API Begin
     add_library(tts_api SHARED
-        mac/audio_tokenizer.cpp
-        mac/audio_detokenizer.mm
-        mac/audio_detokenizer_coreml.m
+        mac/gen/AudioDetokenizer.m
+        mac/gen/AudioTokenizer.m
+        mac/audio_tokenizer_impl.mm
+        mac/audio_detokenizer_impl.mm
         prompt.cpp
         sampler.cpp
         tokenizer.cpp
@@ -127,7 +128,6 @@ elseif(APPLE)
 
     target_link_libraries(tts_api PRIVATE
         llama
-        onnxruntime
         tokenizers_cpp
     )
 
@@ -199,9 +199,10 @@ elseif(APPLE)
 
     # C++ CLI Begin
     add_executable(tts_cli
-        mac/audio_tokenizer.cpp
-        mac/audio_detokenizer_coreml.m
-        mac/audio_detokenizer.mm
+        mac/gen/AudioDetokenizer.m
+        mac/gen/AudioTokenizer.m
+        mac/audio_tokenizer_impl.mm
+        mac/audio_detokenizer_impl.mm
         profiler/perfetto_categories.cpp
         profiler/profiler.cpp
         prompt.cpp
@@ -223,7 +224,6 @@ elseif(APPLE)
 
     target_link_libraries(tts_cli PRIVATE
         llama
-        onnxruntime
         SndFile::sndfile
         argparse::argparse
         tokenizers_cpp
@@ -251,5 +251,4 @@ elseif(APPLE)
 
     # C++ CLI End
     install_llama("${CMAKE_INSTALL_PREFIX}/bin")
-    install_onnxruntime("${CMAKE_INSTALL_PREFIX}/bin")
 endif()

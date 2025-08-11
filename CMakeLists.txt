@@ -28,10 +28,7 @@ if(APPLE)
 endif()
 
 # Third-party dependencies
-if(APPLE)
-    include(ONNXRuntime)
-    find_onnxruntime()
-elseif(WIN32)
+if(WIN32)
     include(OpenVINO)
     find_package(OpenVINO REQUIRED COMPONENTS Runtime)
     include(ONNXRuntime)
