@@ -2,6 +2,7 @@
 #include "../profiler/profiler.h"
 
 #include "audio_detokenizer_impl.h"
+#include "dxgi_device_selector.h"
 
 #include <onnxruntime/dml_provider_factory.h>
 #include <onnxruntime/onnxruntime_c_api.h>
@@ -10,17 +11,22 @@
 namespace spark_tts
 {
     AudioDetokenizerImpl::AudioDetokenizerImpl(const std::string &model_path) : env_(ORT_LOGGING_LEVEL_ERROR, "AudioDetokenizer"),
-                                                                        memory_info_(Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault))
+                                                                                memory_info_(Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault))
     {
         TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::AudioDetokenizer");
 
         try
         {
+            std::unique_ptr<DXGIDeviceSelector> dxgi_device_selector = std::make_unique<DXGIDeviceSelector>();
+            int device_id = dxgi_device_selector->get_high_performance_adapter_index();
+            const std::string device_description = dxgi_device_selector->get_high_performance_adapter_description();
+            std::cerr << "DirectML device ID: " << device_id << ", Description: " << device_description << std::endl;
+
             Ort::SessionOptions session_options;
             // Enable DirectML
             session_options.DisableMemPattern();
             session_options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
-            Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_DML(session_options, 0));
+            Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_DML(session_options, device_id));
 
             bicodec_detokenizer_session_ = std::make_unique<Ort::Session>(env_, std::wstring(model_path.begin(), model_path.end()).c_str(), session_options);
         }
@@ -50,7 +56,7 @@ namespace spark_tts
     }
 
     std::array<float, 16000 * 1> AudioDetokenizerImpl::detokenize(std::array<int64_t, 50> &semantic_tokens,
-                                                              std::array<int32_t, 32> &global_tokens)
+                                                                  std::array<int32_t, 32> &global_tokens)
     {
         TRACE_EVENT("audio_detokenizer", "AudioDetokenizer::detokenize");
 

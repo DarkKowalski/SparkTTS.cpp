@@ -3,6 +3,7 @@ if(WIN32)
     add_library(tts_api SHARED
         win/audio_tokenizer_impl.cpp
         win/audio_detokenizer_impl.cpp
+        win/dxgi_device_selector.cpp
         prompt.cpp
         sampler.cpp
         tokenizer.cpp
@@ -70,6 +71,7 @@ if(WIN32)
     add_executable(tts_cli
         win/audio_tokenizer_impl.cpp
         win/audio_detokenizer_impl.cpp
+        win/dxgi_device_selector.cpp
         profiler/perfetto_categories.cpp
         profiler/profiler.cpp
         prompt.cpp

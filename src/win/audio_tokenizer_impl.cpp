@@ -1,6 +1,7 @@
 #include "../profiler/profiler.h"
 
 #include "audio_tokenizer_impl.h"
+#include "dxgi_device_selector.h"
 
 #include <onnxruntime/dml_provider_factory.h>
 #include <onnxruntime/onnxruntime_c_api.h>
@@ -15,11 +16,16 @@ namespace spark_tts
 
         try
         {
+            std::unique_ptr<DXGIDeviceSelector> dxgi_device_selector = std::make_unique<DXGIDeviceSelector>();
+            int device_id = dxgi_device_selector->get_high_performance_adapter_index();
+            const std::string device_description = dxgi_device_selector->get_high_performance_adapter_description();
+            std::cerr << "DirectML device ID: " << device_id << ", Description: " << device_description << std::endl;
+
             Ort::SessionOptions session_options;
             // Enable DirectML
             session_options.DisableMemPattern();
             session_options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
-            Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_DML(session_options, 0));
+            Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_DML(session_options, device_id));
 
             audio_tokenizer_session_ = std::make_unique<Ort::Session>(env_, std::wstring(model_path.begin(), model_path.end()).c_str(), session_options);
         }
