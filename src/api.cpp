@@ -51,10 +51,9 @@ extern "C"
                                  const char *tokenizer_path,
                                  const uint32_t transformer_n_ctx,
                                  const size_t overlapped_semantic_tokens,
-                                 const size_t callback_semantic_tokens,
-                                 const char *device_name)
+                                 const size_t callback_semantic_tokens)
     {
-        if (!ctx || !audio_detokenizer_model_path || !transformer_model_path || !tokenizer_path || !device_name)
+        if (!ctx || !audio_detokenizer_model_path || !transformer_model_path || !tokenizer_path)
         {
             return false;
         }
@@ -63,7 +62,7 @@ extern "C"
         {
             ctx->synthesizer.init_text_to_speech(
                 audio_detokenizer_model_path, transformer_model_path, tokenizer_path,
-                transformer_n_ctx, overlapped_semantic_tokens, callback_semantic_tokens, device_name);
+                transformer_n_ctx, overlapped_semantic_tokens, callback_semantic_tokens);
         }
         catch (const std::exception &e)
         {

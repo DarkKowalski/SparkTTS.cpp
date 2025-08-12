@@ -57,8 +57,8 @@ int main(void)
                             tokenizer_path,
                             2048, // transformer_n_ctx
                             3,    // overlapped_semantic_tokens
-                            10,   // callback_semantic_tokens, 0 for immediate callback
-                            "CPU");
+                            10    // callback_semantic_tokens, 0 for immediate callback
+    );
 
     size_t voice_features_size;
     int32_t *voice_features = tts_extract_voice_features(ctx, audio_data, audio_size, &voice_features_size);

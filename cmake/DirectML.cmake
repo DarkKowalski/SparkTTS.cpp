@@ -1,5 +1,5 @@
 set(DIRECT_ML_VERSION "1.15.4")
-set(DirectML_URL "https://globalcdn.nuget.org/packages/microsoft.ai.directml.1.15.4.nupkg?packageVersion=${DIRECT_ML_VERSION}")
+set(DIRECT_ML_URL "https://globalcdn.nuget.org/packages/microsoft.ai.directml.1.15.4.nupkg?packageVersion=${DIRECT_ML_VERSION}")
 set(DIRECT_ML_PACKAGE "${CMAKE_BINARY_DIR}/DirectML/microsoft.ai.directml.${DIRECT_ML_VERSION}.nupkg")
 set(DIRECT_ML_NUSPEC "${CMAKE_BINARY_DIR}/DirectML/Microsoft.AI.DirectML.nuspec")
 set(DIRECT_ML_DLL "${CMAKE_BINARY_DIR}/DirectML/bin/x64-win/DirectML.dll")
@@ -12,7 +12,7 @@ function(download_directml)
     # Download to build directory
     if (NOT EXISTS "${DIRECT_ML_PACKAGE}")
         message(STATUS "DirectML package not found, downloading...")
-        file(DOWNLOAD "${DirectML_URL}" "${DIRECT_ML_PACKAGE}" SHOW_PROGRESS)
+        file(DOWNLOAD "${DIRECT_ML_URL}" "${DIRECT_ML_PACKAGE}" SHOW_PROGRESS)
     else()
         message(STATUS "DirectML package already exists, skipping download.")
     endif()
@@ -25,11 +25,19 @@ function(download_directml)
     else()
         message(STATUS "DirectML package already extracted, skipping extraction.")
     endif()
+
+    # Ensure the DLL exists
+    if (NOT EXISTS "${DIRECT_ML_DLL}")
+        message(FATAL_ERROR "DirectML.dll not found in the expected location: ${DIRECT_ML_DLL}")
+    else()
+        message(STATUS "DirectML.dll found at: ${DIRECT_ML_DLL}")
+    endif()
 endfunction()
 
 function(install_directml dest_dir)
     if (NOT EXISTS "${DIRECT_ML_DLL}")
-        message(FATAL_ERROR "DirectML DLL not found. Please ensure the package is downloaded and extracted.")
+        # Download DirectML if not found
+        download_directml()
     endif()
 
     install(FILES "${DIRECT_ML_DLL}" DESTINATION "${dest_dir}")

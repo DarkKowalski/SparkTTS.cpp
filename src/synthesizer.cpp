@@ -46,8 +46,7 @@ namespace spark_tts
                                           const std::string &tokenizer_path,
                                           const uint32_t transformer_n_ctx,
                                           const size_t overlapped_semantic_tokens,
-                                          const size_t callback_semantic_tokens,
-                                          const std::string &device_name)
+                                          const size_t callback_semantic_tokens)
     {
         TRACE_EVENT("synthesizer", "init_text_to_speech");
 
