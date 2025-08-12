@@ -1,5 +1,5 @@
 #include <sndfile.hh>
-
+#include <nlohmann/json.hpp>
 #include <argparse/argparse.hpp>
 
 #include <atomic>

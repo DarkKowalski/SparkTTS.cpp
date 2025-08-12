@@ -9,7 +9,6 @@ project(spark_tts
 )
 
 option(ENABLE_PERFETTO "Enable Perfetto tracing" OFF)
-option(ENABLE_FEATURE_EXTRACTOR "Enable feature extractor" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -30,7 +29,9 @@ endif()
 # Third-party dependencies
 if(WIN32)
     include(ONNXRuntime)
+    include(DirectML)
     find_onnxruntime()
+    download_directml()
 endif()
 
 if(ENABLE_PERFETTO)
@@ -41,6 +42,7 @@ endif()
 
 find_package(SndFile CONFIG REQUIRED)
 find_package(argparse CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_llama()
 
 set(TOKENIZERS_CPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tokenizers-cpp")

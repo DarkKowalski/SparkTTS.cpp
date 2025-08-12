@@ -1,3 +1,4 @@
+#ifdef ENABLE_PERFETTO
 #include <perfetto.h>
 
 PERFETTO_DEFINE_CATEGORIES(
@@ -11,3 +12,5 @@ PERFETTO_DEFINE_CATEGORIES(
         .SetDescription("AudioDetokenizer workload"),
     perfetto::Category("misc")
         .SetDescription("Misc workload"));
+
+#endif // ENABLE_PERFETTO

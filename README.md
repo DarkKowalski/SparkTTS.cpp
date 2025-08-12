@@ -49,7 +49,7 @@ popd
 
 ```batch
 cd third_party\onnxruntime
-python ./tools/ci_build/build.py ^
+python .\tools\ci_build/build.py ^
     --update ^
     --build ^
     --config Release ^
@@ -60,15 +60,9 @@ python ./tools/ci_build/build.py ^
     --skip_tests ^
     --enable_lto ^
     --use_dml
-cmake --install build/Release --config Release --prefix ..\..\lib\onnxruntime
+cmake --install build\Release --config Release --prefix ..\..\lib\onnxruntime
 cd ..\..
 ```
-
-**IMPORTANT**
-
-Download [microsoft.ai.directml.1.15.0.nupkg](https://www.nuget.org/packages/Microsoft.AI.DirectML)
-
-Unzip it and copy `bin\x64-win\DirectML.dll` to your install directory (e.g., `lib\onnxruntime\bin`).
 
 ### Build with CMake and Ninja
 
@@ -77,7 +71,7 @@ Unzip it and copy `bin\x64-win\DirectML.dll` to your install directory (e.g., `l
 ```batch
 cmake --preset=vcpkg -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
-cmake --install build --config Release && copy /Y build\src\*.dll install\bin
+cmake --install build --config Release && copy /Y build\src\*.dll install\tools\bin
 ```
 
 #### macOS

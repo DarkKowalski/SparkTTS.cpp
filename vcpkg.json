@@ -2,6 +2,7 @@
   "dependencies": [
     "libsndfile",
     "argparse",
-    "perfetto"
+    "perfetto",
+    "nlohmann-json"
   ]
 }

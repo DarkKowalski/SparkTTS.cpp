@@ -38,11 +38,14 @@ if(WIN32)
     endif()
 
     install(TARGETS tts_api
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        PUBLIC_HEADER DESTINATION include/tts
+        RUNTIME DESTINATION api/bin
+        LIBRARY DESTINATION api/lib
+        ARCHIVE DESTINATION api/lib
+        PUBLIC_HEADER DESTINATION api/include/tts
     )
+    install_llama("${CMAKE_INSTALL_PREFIX}/api/bin")
+    install_onnxruntime("${CMAKE_INSTALL_PREFIX}/api/bin")
+    install_directml("${CMAKE_INSTALL_PREFIX}/api/bin")
 
     # C-API End
 
@@ -58,7 +61,7 @@ if(WIN32)
     )
 
     install(TARGETS tts_api_example
-        RUNTIME DESTINATION bin
+        RUNTIME DESTINATION tools/bin
     )
 
     # C API Example End
@@ -85,6 +88,7 @@ if(WIN32)
         argparse::argparse
         tokenizers_cpp
         onnxruntime
+        nlohmann_json::nlohmann_json
     )
 
     if(ENABLE_PERFETTO)
@@ -98,12 +102,13 @@ if(WIN32)
     endif()
 
     install(TARGETS tts_cli
-        RUNTIME DESTINATION bin
+        RUNTIME DESTINATION tools/bin
     )
 
     # C++ CLI End
-    install_llama("${CMAKE_INSTALL_PREFIX}/bin")
-    install_onnxruntime("${CMAKE_INSTALL_PREFIX}/bin")
+    install_llama("${CMAKE_INSTALL_PREFIX}/tools/bin")
+    install_onnxruntime("${CMAKE_INSTALL_PREFIX}/tools/bin")
+    install_directml("${CMAKE_INSTALL_PREFIX}/tools/bin")
 
 elseif(APPLE)
     # C-API Begin
@@ -162,11 +167,12 @@ elseif(APPLE)
     endif()
 
     install(TARGETS tts_api
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION bin
-        ARCHIVE DESTINATION lib
-        PUBLIC_HEADER DESTINATION include/tts
+        RUNTIME DESTINATION api/bin
+        LIBRARY DESTINATION api/bin
+        ARCHIVE DESTINATION api/lib
+        PUBLIC_HEADER DESTINATION api/include/tts
     )
+    install_llama("${CMAKE_INSTALL_PREFIX}/api/bin")
 
     # C-API End
 
@@ -189,7 +195,7 @@ elseif(APPLE)
     )
 
     install(TARGETS tts_api_example
-        RUNTIME DESTINATION bin
+        RUNTIME DESTINATION tools/bin
     )
 
     # C API Example End
@@ -224,6 +230,7 @@ elseif(APPLE)
         SndFile::sndfile
         argparse::argparse
         tokenizers_cpp
+        nlohmann_json::nlohmann_json
     )
 
     target_link_libraries(tts_cli PRIVATE
@@ -243,9 +250,9 @@ elseif(APPLE)
     endif()
 
     install(TARGETS tts_cli
-        RUNTIME DESTINATION bin
+        RUNTIME DESTINATION tools/bin
     )
 
     # C++ CLI End
-    install_llama("${CMAKE_INSTALL_PREFIX}/bin")
+    install_llama("${CMAKE_INSTALL_PREFIX}/tools/bin")
 endif()
