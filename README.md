@@ -1,4 +1,5 @@
 # SparkTTS inference with C++
+
 Windows:
  - ONNX Runtime (DirectML backend) for BiCodec/Wav2Vec etc.
  - llama.cpp (Vulkan backend) for Qwen2.5-0.5B
@@ -6,6 +7,10 @@ Windows:
 macOS:
  - CoreML for BiCodec/Wav2Vec etc.
  - llama.cpp (Metal backend) for Qwen2.5-0.5B
+
+## Performance
+
+With Q4-K quantized transformer, it can achieve Real-Time Factor (RTF) of approximately 0.15 and 300ms first audio sample latency on a NVIDIA RTX 4070 GPU.
 
 ## How to build
 
@@ -81,3 +86,20 @@ cmake --preset=vcpkg -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 cmake --install build --config Release
 ```
+
+## How to use
+
+[C API](src/api.h) is provided for C++ and other languages.
+
+[Example command line tool](src/main.cpp) is provided to for performance tuning.
+
+## Acknowledgements
+
+Models used in this project are from [SparkAudio/Spark-TTS](https://github.com/SparkAudio/Spark-TTS)
+
+Inspired by [arghyasur1991/Spark-TTS-Unity](https://github.com/arghyasur1991/Spark-TTS-Unity)
+
+Third-party libraries used in this project:
+- [ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)
+- [microsoft/onnxruntime](https://github.com/microsoft/onnxruntime)
+- [mlc-ai/tokenizers-cpp](https://github.com/mlc-ai/tokenizers-cpp)
