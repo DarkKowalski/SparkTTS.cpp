@@ -235,21 +235,6 @@ namespace tool
             const std::string transformer_model_path = model_path_ + "/Transformer/model.gguf";
             const std::string tokenizer_path = model_path_ + "/Tokenizer/tokenizer.json";
 
-            if (enable_clone_)
-            {
-                synthesizer_.init_voice_feature_extraction(audio_tokenizer_model_path);
-            }
-
-            if (enable_tts_)
-            {
-                synthesizer_.init_text_to_speech(
-                    audio_detokenizer_model_path,
-                    transformer_model_path,
-                    tokenizer_path,
-                    transformer_n_ctx_,
-                    overlapped_semantic_tokens_);
-            }
-
             if (interactive_mode_)
             {
                 run_interactive_mode();
@@ -261,9 +246,69 @@ namespace tool
         }
 
     private:
+        void init_clone()
+        {
+            if (!enable_clone_)
+            {
+                return;
+            }
+
+#if defined(_WIN32)
+            const std::string audio_tokenizer_model_path = model_path_ + "/AudioTokenizer/AudioTokenizer.onnx";
+#elif defined(__APPLE__)
+            const std::string audio_tokenizer_model_path = model_path_ + "/AudioTokenizer/AudioTokenizer.mlmodelc";
+#endif
+
+            synthesizer_.init_voice_feature_extraction(audio_tokenizer_model_path);
+        }
+
+        void deinit_clone()
+        {
+            if (!enable_clone_)
+            {
+                return;
+            }
+
+            synthesizer_.deinit_voice_feature_extraction();
+        }
+
+        void init_tts()
+        {
+            if (!enable_tts_)
+            {
+                return;
+            }
+
+#if defined(_WIN32)
+            const std::string audio_detokenizer_model_path = model_path_ + "/AudioDetokenizer/AudioDetokenizer.onnx";
+#elif defined(__APPLE__)
+            const std::string audio_detokenizer_model_path = model_path_ + "/AudioDetokenizer/AudioDetokenizer.mlmodelc";
+#endif
+            const std::string transformer_model_path = model_path_ + "/Transformer/model.gguf";
+            const std::string tokenizer_path = model_path_ + "/Tokenizer/tokenizer.json";
+
+            synthesizer_.init_text_to_speech(
+                audio_detokenizer_model_path,
+                transformer_model_path,
+                tokenizer_path,
+                transformer_n_ctx_,
+                overlapped_semantic_tokens_);
+        }
+
+        void deinit_tts()
+        {
+            if (!enable_tts_)
+            {
+                return;
+            }
+
+            synthesizer_.deinit_text_to_speech();
+        }
+
         void run_one_shot_mode()
         {
             std::cerr << "Running in one-shot mode." << std::endl;
+            init_clone();
 
             VoiceCloneInput clone_input;
             clone_input.source = one_shot_input_audio_path_;
@@ -281,6 +326,10 @@ namespace tool
                 std::cout << feature << " ";
             }
             std::cout << std::endl;
+
+            deinit_clone(); // free resources after cloning
+
+            init_tts();
 
             std::cout << "Starting text-to-speech generation..." << std::endl;
 
@@ -313,11 +362,8 @@ namespace tool
 
         void run_interactive_mode()
         {
-            if (!enable_clone_ && !enable_tts_)
-            {
-                std::cerr << "No features enabled. Exiting." << std::endl;
-                return;
-            }
+            init_clone();
+            init_tts();
 
             std::cerr << "Running in interactive mode. Press Ctrl+C to exit." << std::endl;
 

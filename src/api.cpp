@@ -72,6 +72,22 @@ extern "C"
         return true;
     }
 
+    void tts_deinit_voice_feature_extraction(tts_context *ctx)
+    {
+        if (ctx)
+        {
+            ctx->synthesizer.deinit_voice_feature_extraction();
+        }
+    }
+
+    void tts_deinit_text_to_speech(tts_context *ctx)
+    {
+        if (ctx)
+        {
+            ctx->synthesizer.deinit_text_to_speech();
+        }
+    }
+
     int32_t *tts_extract_voice_features(tts_context *ctx,
                                         const float *audio_data,
                                         const size_t audio_size,

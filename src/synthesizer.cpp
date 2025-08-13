@@ -104,6 +104,20 @@ namespace spark_tts
         return generated_audio;
     }
 
+    void Synthesizer::deinit_voice_feature_extraction()
+    {
+        audio_tokenizer_.reset();
+    }
+
+    void Synthesizer::deinit_text_to_speech()
+    {
+        audio_detokenizer_.reset();
+        transformer_.reset();
+        token_buffer_.reset();
+        overlapped_semantic_tokens_ = 0;
+        synthesized_frames_ = 0;
+    }
+
     Transformer::DecodeCallbackAction Synthesizer::decode_callback(std::string &semantic_tokens,
                                                                    std::array<int32_t, 32> &voice_features,
                                                                    TextToSpeechCallback &callback)

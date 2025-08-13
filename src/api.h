@@ -45,6 +45,10 @@ extern "C"
                                          const uint32_t transformer_n_ctx,
                                          const size_t overlapped_semantic_tokens);
 
+    TTS_API void tts_deinit_voice_feature_extraction(tts_context *ctx);
+
+    TTS_API void tts_deinit_text_to_speech(tts_context *ctx);
+
     // free after use
     TTS_API int32_t *tts_extract_voice_features(tts_context *ctx,
                                                 const float *audio_data,

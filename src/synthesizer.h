@@ -37,6 +37,10 @@ namespace spark_tts
                                  const uint32_t transformer_n_ctx,
                                  const size_t overlapped_semantic_tokens);
 
+        void deinit_voice_feature_extraction();
+
+        void deinit_text_to_speech();
+
     public:
         std::array<int32_t, 32> extract_voice_features(const std::vector<float> &audio_data);
 
