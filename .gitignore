@@ -163,6 +163,7 @@ $RECYCLE.BIN/
 /coreml_models
 /third_party/openvino
 /lib
+/output
 *.wav
 *.gguf
 *.onnx

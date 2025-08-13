@@ -50,8 +50,7 @@ extern "C"
                                  const char *transformer_model_path,
                                  const char *tokenizer_path,
                                  const uint32_t transformer_n_ctx,
-                                 const size_t overlapped_semantic_tokens,
-                                 const size_t callback_semantic_tokens)
+                                 const size_t overlapped_semantic_tokens)
     {
         if (!ctx || !audio_detokenizer_model_path || !transformer_model_path || !tokenizer_path)
         {
@@ -62,7 +61,7 @@ extern "C"
         {
             ctx->synthesizer.init_text_to_speech(
                 audio_detokenizer_model_path, transformer_model_path, tokenizer_path,
-                transformer_n_ctx, overlapped_semantic_tokens, callback_semantic_tokens);
+                transformer_n_ctx, overlapped_semantic_tokens);
         }
         catch (const std::exception &e)
         {
@@ -106,7 +105,6 @@ extern "C"
                             const char *text,
                             const int32_t *voice_features, // array of size 32
                             const size_t n_sec,
-                            const bool drop_last,
                             void *user_data,
                             tts_synthesis_callback callback)
     {
@@ -124,7 +122,7 @@ extern "C"
             {
                 return callback(user_data, audio_data.data(), audio_data.size());
             };
-            ctx->synthesizer.text_to_speech(text, voice_features_array, n_sec, drop_last, cb);
+            ctx->synthesizer.text_to_speech(text, voice_features_array, n_sec, cb);
         }
         catch (const std::exception &e)
         {

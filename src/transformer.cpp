@@ -79,7 +79,11 @@ namespace spark_tts
         }
     }
 
-    void Transformer::infer(const std::string &prompt, const size_t n_predict, const size_t callback_tokens, DecodeCallback &callback)
+    void Transformer::infer(const std::string &prompt,
+                            const size_t n_predict,
+                            const size_t callback_tokens,
+                            const size_t first_callback_tokens,
+                            DecodeCallback &callback)
     {
         TRACE_EVENT("transformer", "Transformer::infer");
 
@@ -88,6 +92,8 @@ namespace spark_tts
 
         size_t n_total = 0;
         size_t n_callback = 0;
+        bool first_callback_executed = false;
+
         std::string callback_buffer;
         constexpr size_t each_token_size = 25; // Approximate size of each token in characters
         callback_buffer.reserve(callback_tokens * each_token_size);
@@ -107,7 +113,6 @@ namespace spark_tts
 
             llama_token new_token = sampler_->sample(ctx_, -1, false);
             sampler_->accept(new_token, false);
-
             if (llama_vocab_is_eog(vocab_, new_token))
             {
                 break;
@@ -118,10 +123,23 @@ namespace spark_tts
             n_callback++;
             n_total++;
 
-            // callback
-            if (callback_tokens <= n_callback)
+            if (first_callback_executed && callback_tokens <= n_callback)
             {
                 auto action = callback(callback_buffer);
+
+                callback_buffer.clear();
+                n_callback = 0;
+
+                if (action == DecodeCallbackAction::Stop)
+                {
+                    break;
+                }
+            }
+            else if (!first_callback_executed && first_callback_tokens <= n_callback)
+            {
+                auto action = callback(callback_buffer);
+                first_callback_executed = true;
+
                 callback_buffer.clear();
                 n_callback = 0;
 

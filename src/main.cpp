@@ -182,22 +182,22 @@ namespace tool
                 .default_value(overlapped_semantic_tokens_)
                 .scan<'i', int32_t>();
 
-            program_.add_argument("-cst", "--callback-semantic-tokens")
-                .help("Number of tokens to trigger callback (0 for immediate callback, default 10)")
-                .default_value(callback_semantic_tokens_)
-                .scan<'i', int32_t>();
-
             program_.add_argument("-i", "--input")
                 .help("Path to the input audio file for voice cloning")
-                .default_value(std::string("./prompt_audio.wav"));
+                .default_value(one_shot_input_audio_path_);
 
             program_.add_argument("-o", "--output")
-                .help("Path to the output audio file for voice cloning")
-                .default_value(std::string("./output.wav"));
+                .help("Path to the output directory for synthesized audio")
+                .default_value(one_shot_output_audio_dir_);
 
             program_.add_argument("-t", "--text")
                 .help("Text to synthesize for text-to-speech")
-                .default_value(std::string("Hello, this is a test of the Spark TTS system."));
+                .default_value(one_shot_text_);
+
+            program_.add_argument("-n", "--n-generations")
+                .help("Number of generations to perform in one-shot mode")
+                .default_value(one_shot_n_generations_)
+                .scan<'i', int32_t>();
 
             program_.parse_args(argc, argv);
 
@@ -210,11 +210,11 @@ namespace tool
             transformer_n_ctx_ = program_.get<uint32_t>("--n-ctx");
             tts_n_seconds_ = program_.get<int32_t>("--n-seconds");
             overlapped_semantic_tokens_ = program_.get<int32_t>("--overlapped-semantic-tokens");
-            callback_semantic_tokens_ = program_.get<int32_t>("--callback-semantic-tokens");
 
-            one_shot_output_audio_path_ = program_.get<std::string>("--output");
+            one_shot_output_audio_dir_ = program_.get<std::string>("--output");
             one_shot_input_audio_path_ = program_.get<std::string>("--input");
             one_shot_text_ = program_.get<std::string>("--text");
+            one_shot_n_generations_ = program_.get<int32_t>("--n-generations");
 
             if (!interactive_mode_)
             {
@@ -237,20 +237,17 @@ namespace tool
 
             if (enable_clone_)
             {
-                std::cerr << "Voice cloning feature is enabled." << std::endl;
                 synthesizer_.init_voice_feature_extraction(audio_tokenizer_model_path);
             }
 
             if (enable_tts_)
             {
-                std::cerr << "Text-to-speech feature is enabled." << std::endl;
                 synthesizer_.init_text_to_speech(
                     audio_detokenizer_model_path,
                     transformer_model_path,
                     tokenizer_path,
                     transformer_n_ctx_,
-                    overlapped_semantic_tokens_,
-                    callback_semantic_tokens_);
+                    overlapped_semantic_tokens_);
             }
 
             if (interactive_mode_)
@@ -278,21 +275,6 @@ namespace tool
                 return;
             }
 
-            std::array<int32_t, 32> voice_features;
-            std::copy(clone_output.features.begin(), clone_output.features.end(), voice_features.begin());
-            TextToSpeechInput tts_input;
-            tts_input.text = one_shot_text_;
-            tts_input.features = voice_features;
-            tts_input.output_path = one_shot_output_audio_path_;
-
-            TextToSpeechOutput tts_output = text_to_speech_sync(tts_input);
-            if (!tts_output.ok)
-            {
-                std::cerr << "Text-to-speech failed: " << tts_output.message << std::endl;
-                return;
-            }
-            std::cout << "Text-to-speech completed successfully. Output saved to: " << one_shot_output_audio_path_ << std::endl;
-
             std::cout << "Generated audio features: ";
             for (const auto &feature : clone_output.features)
             {
@@ -300,9 +282,32 @@ namespace tool
             }
             std::cout << std::endl;
 
-            if (enable_perf_)
+            std::cout << "Starting text-to-speech generation..." << std::endl;
+
+            std::array<int32_t, 32> voice_features;
+            std::copy(clone_output.features.begin(), clone_output.features.end(), voice_features.begin());
+            TextToSpeechInput tts_input;
+            tts_input.text = one_shot_text_;
+            tts_input.features = voice_features;
+
+            for (int i = 0; i < one_shot_n_generations_; ++i)
             {
-                std::cout << "Performance info: " << tts_output.message << std::endl;
+                std::filesystem::path output_path(one_shot_output_audio_dir_);
+                output_path /= "output_" + std::to_string(i) + ".wav";
+                tts_input.output_path = output_path.string();
+
+                TextToSpeechOutput tts_output = text_to_speech_sync(tts_input);
+                if (!tts_output.ok)
+                {
+                    std::cerr << "Text-to-speech failed: " << tts_output.message << std::endl;
+                    return;
+                }
+                std::cout << "Text-to-speech completed successfully. Output saved to: " << tts_input.output_path << std::endl;
+
+                if (enable_perf_)
+                {
+                    std::cout << "Performance info: " << tts_output.message << std::endl;
+                }
             }
         }
 
@@ -391,6 +396,14 @@ namespace tool
                 return {false, "Text-to-speech feature is not enabled."};
             }
 
+            // create parent directory if it doesn't exist
+            std::filesystem::path output_dir = output_path;
+            output_dir = output_dir.parent_path();
+            if (!std::filesystem::exists(output_dir))
+            {
+                std::filesystem::create_directories(output_dir);
+            }
+
             std::array<int32_t, 32> voice_features = features;
             std::vector<float> audio_data;
             std::string perf_info;
@@ -409,7 +422,7 @@ namespace tool
                 };
 
                 std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-                synthesizer_.text_to_speech(text, voice_features, tts_n_seconds_, false, callback);
+                synthesizer_.text_to_speech(text, voice_features, tts_n_seconds_, callback);
                 std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
                 std::chrono::duration<double> elapsed_time = end_time - start_time;
 
@@ -425,7 +438,7 @@ namespace tool
                     audio_data.insert(audio_data.end(), audio_output.begin(), audio_output.end());
                     return true; // Continue generating
                 };
-                synthesizer_.text_to_speech(text, voice_features, tts_n_seconds_, false, callback);
+                synthesizer_.text_to_speech(text, voice_features, tts_n_seconds_, callback);
             }
 
             // Write the audio data to a file
@@ -446,14 +459,14 @@ namespace tool
 
         std::string model_path_;
 
-        std::string one_shot_output_audio_path_;
-        std::string one_shot_input_audio_path_;
-        std::string one_shot_text_;
+        std::string one_shot_output_audio_dir_ = "./output/";
+        std::string one_shot_input_audio_path_ = "./prompt_audio.wav";
+        std::string one_shot_text_ = "Hello, this is a test of the Spark TTS system.";
+        int32_t one_shot_n_generations_ = 1;
 
         uint32_t transformer_n_ctx_ = 2048;      // Default context size
         int32_t tts_n_seconds_ = 120;            // Default max seconds to generate
         int32_t overlapped_semantic_tokens_ = 3; // Default overlap for semantic tokens
-        int32_t callback_semantic_tokens_ = 10;  // Default callback tokens, 0 for immediate callback
     };
 
 } // namespace tool

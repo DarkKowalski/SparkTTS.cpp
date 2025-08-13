@@ -56,8 +56,7 @@ int main(void)
                             transformer_model_path,
                             tokenizer_path,
                             2048, // transformer_n_ctx
-                            3,    // overlapped_semantic_tokens
-                            10    // callback_semantic_tokens, 0 for immediate callback
+                            3     // overlapped_semantic_tokens
     );
 
     size_t voice_features_size;
@@ -74,7 +73,7 @@ int main(void)
             .capacity = n_sec * 16000};
 
         printf("Starting text-to-speech generation...\n");
-        tts_text_to_speech(ctx, text, voice_features, n_sec, false, &buffer, callback);
+        tts_text_to_speech(ctx, text, voice_features, n_sec, &buffer, callback);
         printf("Text-to-speech generation completed.\n");
 
         if (buffer.data)

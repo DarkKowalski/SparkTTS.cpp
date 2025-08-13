@@ -45,17 +45,15 @@ namespace spark_tts
                                           const std::string &transformer_model_path,
                                           const std::string &tokenizer_path,
                                           const uint32_t transformer_n_ctx,
-                                          const size_t overlapped_semantic_tokens,
-                                          const size_t callback_semantic_tokens)
+                                          const size_t overlapped_semantic_tokens)
     {
         TRACE_EVENT("synthesizer", "init_text_to_speech");
 
-        if (overlapped_semantic_tokens > 25 || callback_semantic_tokens > 50)
+        if (overlapped_semantic_tokens >= 25)
         {
-            throw std::invalid_argument("Invalid overlapped/callback semantic tokens");
+            throw std::invalid_argument("overlapped_semantic_tokens must be less than 25");
         }
         overlapped_semantic_tokens_ = overlapped_semantic_tokens;
-        callback_semantic_tokens_ = callback_semantic_tokens;
 
         audio_detokenizer_ = std::make_unique<AudioDetokenizerImpl>(audio_detokenizer_model_path);
 
@@ -131,7 +129,6 @@ namespace spark_tts
     void Synthesizer::text_to_speech(const std::string &text,
                                      std::array<int32_t, 32> &voice_features,
                                      const size_t n_sec,
-                                     const bool drop_last,
                                      TextToSpeechCallback &callback)
     {
         TRACE_EVENT("synthesizer", "text_to_speech");
@@ -146,14 +143,11 @@ namespace spark_tts
             return decode_callback(semantic_tokens, voice_features, callback);
         };
 
-        synthesized_frames_ = 0; // Reset the synthesized frames count
-        token_buffer_->clear();  // Clear the token buffer before starting a new inference
-        transformer_->infer(prompt, n_predict, callback_semantic_tokens_, decode_cb);
-
-        if (drop_last)
-        {
-            return;
-        }
+        synthesized_frames_ = 0;                         // Reset the synthesized frames count
+        token_buffer_->clear();                          // Clear the token buffer before starting a new inference
+        constexpr size_t first_callback_tokens = 50 + 1; // The first token cannot generate audio
+        const size_t callback_tokens = 50 - overlapped_semantic_tokens_;
+        transformer_->infer(prompt, n_predict, callback_tokens, first_callback_tokens, decode_cb);
 
         auto last_audio_output = synthesize(voice_features);
         if (!last_audio_output.empty())

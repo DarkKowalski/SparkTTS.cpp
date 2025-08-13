@@ -29,7 +29,7 @@ macOS:
 
 ```batch
 cd third_party\llama.cpp
-cmake -B build -G Ninja -DGGML_VULKAN=ON -DLLAMA_CURL=OFF -DCMAKE_INSTALL_PREFIX=..\..\lib\llama
+cmake -B build -G Ninja -DGGML_VULKAN=ON -DLLAMA_CURL=OFF -DCMAKE_INSTALL_PREFIX=..\..\lib\llama -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 cmake --install build --config Release
 cd ..\..
@@ -39,7 +39,7 @@ cd ..\..
 
 ```bash
 pushd third_party/llama.cpp
-cmake -B build -G Ninja -DLLAMA_CURL=OFF -DCMAKE_INSTALL_PREFIX=../../lib/llama
+cmake -B build -G Ninja -DLLAMA_CURL=OFF -DCMAKE_INSTALL_PREFIX=../../lib/llama -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 cmake --install build --config Release
 popd

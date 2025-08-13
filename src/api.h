@@ -43,8 +43,7 @@ extern "C"
                                          const char *transformer_model_path,
                                          const char *tokenizer_path,
                                          const uint32_t transformer_n_ctx,
-                                         const size_t overlapped_semantic_tokens,
-                                         const size_t callback_semantic_tokens);
+                                         const size_t overlapped_semantic_tokens);
 
     // free after use
     TTS_API int32_t *tts_extract_voice_features(tts_context *ctx,
@@ -56,7 +55,6 @@ extern "C"
                                     const char *text,
                                     const int32_t *voice_features, // array of size 32
                                     const size_t n_sec,            // max number of seconds to generate
-                                    const bool drop_last,
                                     void *user_data,
                                     tts_synthesis_callback callback);
 

@@ -35,8 +35,7 @@ namespace spark_tts
                                  const std::string &transformer_model_path,
                                  const std::string &tokenizer_path,
                                  const uint32_t transformer_n_ctx,
-                                 const size_t overlapped_semantic_tokens,
-                                 const size_t callback_semantic_tokens);
+                                 const size_t overlapped_semantic_tokens);
 
     public:
         std::array<int32_t, 32> extract_voice_features(const std::vector<float> &audio_data);
@@ -45,7 +44,6 @@ namespace spark_tts
             const std::string &text,
             std::array<int32_t, 32> &voice_features,
             const size_t n_sec, // max number of seconds to generate
-            const bool drop_last,
             TextToSpeechCallback &callback);
 
     private:
@@ -64,10 +62,6 @@ namespace spark_tts
         size_t overlapped_semantic_tokens_; // Number of tokens to overlap between generations
                                             // Tradeoff between quality and throughput
                                             // 0 to 25, 3 to 5 is good for most cases
-
-        size_t callback_semantic_tokens_; // Number of tokens to trigger callback, 0 for immediate callback
-                                          // Tradeoff between latency and throughput
-                                          // 0 to 50
 
         size_t synthesized_frames_; // Number of frames synthesized for the current text
     };
