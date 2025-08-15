@@ -57,7 +57,8 @@ namespace spark_tts
         ~Transformer();
 
     public:
-        void infer(const std::string &prompt,
+        // return true if meet end of generation
+        bool infer(const std::string &prompt,
                    const size_t n_predict,             // max number of tokens to generate
                    const size_t callback_tokens,       // number of tokens to trigger callback, 0 for immediate callback
                    const size_t first_callback_tokens, // number of tokens to trigger the first callback, 0 for immediate callback

@@ -161,12 +161,15 @@ namespace spark_tts
         token_buffer_->clear();                          // Clear the token buffer before starting a new inference
         constexpr size_t first_callback_tokens = 50 + 1; // The first token cannot generate audio
         const size_t callback_tokens = 50 - overlapped_semantic_tokens_;
-        transformer_->infer(prompt, n_predict, callback_tokens, first_callback_tokens, decode_cb);
+        bool end_of_generation = transformer_->infer(prompt, n_predict, callback_tokens, first_callback_tokens, decode_cb);
 
-        auto last_audio_output = synthesize(voice_features);
-        if (!last_audio_output.empty())
+        if (end_of_generation)
         {
-            callback(last_audio_output);
+            auto last_audio_output = synthesize(voice_features);
+            if (!last_audio_output.empty())
+            {
+                callback(last_audio_output);
+            }
         }
     }
 

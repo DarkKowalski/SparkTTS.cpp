@@ -79,7 +79,7 @@ namespace spark_tts
         }
     }
 
-    void Transformer::infer(const std::string &prompt,
+    bool Transformer::infer(const std::string &prompt,
                             const size_t n_predict,
                             const size_t callback_tokens,
                             const size_t first_callback_tokens,
@@ -101,6 +101,8 @@ namespace spark_tts
         auto input_tokens = tokenizer_->tokenize(prompt);
         llama_batch batch = llama_batch_get_one(input_tokens.data(), input_tokens.size());
 
+        bool end_of_generation = false;
+
         while (n_total < n_predict)
         {
             TRACE_EVENT_BEGIN("transformer", "llama_decode");
@@ -115,6 +117,7 @@ namespace spark_tts
             sampler_->accept(new_token, false);
             if (llama_vocab_is_eog(vocab_, new_token))
             {
+                end_of_generation = true;
                 break;
             }
 
@@ -157,6 +160,8 @@ namespace spark_tts
         {
             callback(callback_buffer);
         }
+
+        return end_of_generation;
     }
 
 } // namespace spark_tts

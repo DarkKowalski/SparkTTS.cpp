@@ -46,7 +46,7 @@ int main(void)
     const char *audio_tokenizer_model_path = "./models/Spark-TTS-0.5B/AudioTokenizer/AudioTokenizer.mlmodelc";
     const char *audio_detokenizer_model_path = "./models/Spark-TTS-0.5B/AudioDetokenizer/AudioDetokenizer.mlmodelc";
 #endif
-    const char *transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model_q4_k.gguf";
+    const char *transformer_model_path = "./models/Spark-TTS-0.5B/Transformer/model.gguf";
     const char *tokenizer_path = "./models/Spark-TTS-0.5B/Tokenizer/tokenizer.json";
 
     tts_init_voice_feature_extraction(ctx, audio_tokenizer_model_path);
